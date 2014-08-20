@@ -28,6 +28,7 @@ int score = 0;
 int heart = 5;
 int currentWave = 1;
 int ultiBar = 0;
+char b = 178;
 
 void init()
 {
@@ -94,7 +95,7 @@ void update(double dt)
         charLocation.Y--; 
     }
 
-    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 22)
+    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 21)
     {
         charLocation.Y++; 
     }
@@ -174,9 +175,10 @@ void render()
 
     gotoXY(charLocation);
     colour(0x09);
-    std::cout << "  |\________________ " << std::endl;
-	std::cout << "  |     ==== _______|"  << std::endl;
-	std::cout << "__/___  ====_/       ";
+    std::cout << " /---\___________" << std::endl;
+	std::cout << " _____________|_|"  << std::endl;
+	std::cout << "/===========\\" << std::endl;
+	std::cout << "\_@_@_@_@_@_/";
 
 	if (createUlti == 1)
 	{
@@ -190,11 +192,11 @@ void render()
 
 	gotoXY(missileRLocation);
 	colour(0x0C);  
-	std::cout << "---=====>>"; 
+	std::cout << "--===>"; 
 
 	gotoXY(missileLLocation);
 	colour(0x0C);
-	std::cout << "---=====>>";
+	std::cout << "--===>";
 
 }
 
@@ -326,9 +328,9 @@ void createEnemy()
 			heart--; 
 		}
 
-		for ( int j = 0 ; j < 21 ; j++ ) 
+		for ( int j = 0 ; j < 17 ; j++ ) 
 		{ 
-			for ( int k = 0 ; k < 3 ; k++ ) 
+			for ( int k = 0 ; k < 4 ; k++ ) 
 			{ 
 				if ( enemyLocation[i].X == charLocation.X + j && enemyLocation[i].Y == charLocation.Y + k)
 				{ 
