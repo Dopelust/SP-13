@@ -27,7 +27,7 @@ bool createUlti = 0;
 int score = 0; 
 int heart = 5;
 int currentWave = 1;
-int ultiBar = 0;
+int ultiBar = 50;
 char b = 178;
 
 void init()
@@ -175,20 +175,20 @@ void render()
 
     gotoXY(charLocation);
     colour(0x09);
-    std::cout << " /---\___________" << std::endl;
-	std::cout << " _____________|_|"  << std::endl;
-	std::cout << "/===========\\" << std::endl;
-	std::cout << "\_@_@_@_@_@_/";
-
+    std::cout << "  /---\\_________" << std::endl;
+	std::cout << " |____________|_|";
 	if (createUlti == 1)
 	{
 		gotoXY(ultiLocation);
 		colour(0x0C);
-		for ( int i = 14; i < ultiLocation.X; i++)
+		for ( int i = 18; i < ultiLocation.X; i++)
 		{
 			std::cout << "=";
 		}
+		colour(0x09);
 	}
+	std::cout << std::endl << "  /===========\\" << std::endl ;
+	std::cout << "  \\_@_@_@_@_@_/";
 
 	gotoXY(missileRLocation);
 	colour(0x0C);  
@@ -219,37 +219,37 @@ void missile()
 
 	if (createMissileR == 1)
 	{
-		missileRLocation.X+=10;
+		missileRLocation.X+=6;
 
-		if (missileRLocation.X > consoleSize.X - 1)
+		if (missileRLocation.X >= consoleSize.X - 5)
 		{
 			createMissileR = 0;
-			missileRLocation.X = charLocation.X + 10;
+			missileRLocation.X = charLocation.X + 8;
 			missileRLocation.Y = charLocation.Y + 1;
 		}
 	}
 
 	else
 	{
-		missileRLocation.X = charLocation.X + 10 ;
+		missileRLocation.X = charLocation.X + 8 ;
 		missileRLocation.Y = charLocation.Y + 1 ;
 	}
 
 	if (createMissileL == 1)
 	{
-		missileLLocation.X+=10;
+		missileLLocation.X+=6;
 
-		if (missileLLocation.X > consoleSize.X - 1)
+		if (missileLLocation.X >= consoleSize.X - 5)
 		{
 			createMissileL = 0;
-			missileLLocation.X = charLocation.X;
+			missileLLocation.X = charLocation.X + 2;
 			missileLLocation.Y = charLocation.Y + 1;
 		}
 	}
 
 	else
 	{
-		missileLLocation.X = charLocation.X;
+		missileLLocation.X = charLocation.X + 2;
 		missileLLocation.Y = charLocation.Y + 1;
 	}
 }
@@ -328,6 +328,9 @@ void createEnemy()
 			heart--; 
 		}
 
+		else if (enemyLocation[i].X < 18 )
+		{
+
 		for ( int j = 0 ; j < 17 ; j++ ) 
 		{ 
 			for ( int k = 0 ; k < 4 ; k++ ) 
@@ -341,7 +344,7 @@ void createEnemy()
 			} 
 		} 
 
-
+		}
 	}
 	
 }
