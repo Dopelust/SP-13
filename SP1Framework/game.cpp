@@ -124,15 +124,15 @@ void render()
     colour(0x0A);
     std::cout << 1.0 / deltaTime << "fps";
 	
-	gotoXY(60, 0);
+	gotoXY(55, 0);
 	colour(0x0A);
-	std::cout << ultiBar;
+	std::cout << "UltiBar " << ultiBar ;
 
-	gotoXY(50,0); 
+	gotoXY(43,0); 
 	colour(0x0A);
 	std::cout << score << " score"; 
 
-	gotoXY(35,0);
+	gotoXY(30,0);
 	colour(0x0A);
 	std::cout << "Wave " << currentWave;
 
