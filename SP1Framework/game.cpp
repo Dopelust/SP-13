@@ -149,7 +149,7 @@ void render()
 
 	gotoXY(deathLocation); 
 	colour(0x7C); 
-	std::cout << "BOOM";
+	std::cout << "BOOM"; 
 	deathLocation = nullLocation ; 
 
 	gotoXY(17,0); 
