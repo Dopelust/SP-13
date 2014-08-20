@@ -94,7 +94,7 @@ void update(double dt)
         charLocation.Y--; 
     }
 
-    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1)
+    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 22)
     {
         charLocation.Y++; 
     }
