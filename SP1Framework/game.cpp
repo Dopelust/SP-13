@@ -164,9 +164,9 @@ void render()
 
     gotoXY(charLocation);
     colour(0x09);
-    std::cout << "  |\________________" << std::endl;
+    std::cout << "  |\________________ " << std::endl;
 	std::cout << "  |     ==== _______|"  << std::endl;
-	std::cout << "__/___  ====_/";
+	std::cout << "__/___  ====_/       ";
 
 	if (createUlti == 1)
 	{
@@ -300,7 +300,7 @@ void createEnemy()
 			}
 		}
 
-		if ( (enemyLocation[i].Y == ultiLocation.Y) ) 
+		if (enemyLocation[i].Y == ultiLocation.Y) 
 		{ 
 			enemyLocation[i].X = consoleSize.X - 5;
 			enemyLocation[i].Y = rand() % 20 + 3 ;
@@ -313,6 +313,21 @@ void createEnemy()
 			enemyLocation[i].Y = rand() % 20 + 3;
 			heart--; 
 		}
+
+		for ( int j = 0 ; j < 21 ; j++ ) 
+		{ 
+			for ( int k = 0 ; k < 3 ; k++ ) 
+			{ 
+				if ( enemyLocation[i].X == charLocation.X + j && enemyLocation[i].Y == charLocation.Y + k)
+				{ 
+					enemyLocation[i].X = consoleSize.X - 5;
+					enemyLocation[i].Y = rand() % 20 + 3 ;
+					heart--; 
+				} 
+			} 
+		} 
+
+
 	}
 	
 }
