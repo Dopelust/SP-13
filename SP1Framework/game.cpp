@@ -127,22 +127,22 @@ void render()
     colour(0x0A);
     std::cout << 1.0 / deltaTime << "fps";
 	
-	gotoXY(15, 1);
+	gotoXY(17, 1);
 	colour(0x0B);
 	for (int i = 0; i < ultiBar/10; i++)
 	{
 		std::cout << char(4) << " ";
 	}
 
-	gotoXY(43,0); 
+	gotoXY(52,0); 
 	colour(0x0A);
 	std::cout << score << " score"; 
 
-	gotoXY(30,0);
+	gotoXY(35,0);
 	colour(0x0A);
 	std::cout << "Wave " << currentWave;
 
-	gotoXY(15,0); 
+	gotoXY(17,0); 
 	colour(0x0C); 
 	for (int i = 0; i < heart; i++)
 	{
