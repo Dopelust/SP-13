@@ -18,7 +18,9 @@ COORD missileRLocation;
 COORD missileLLocation;
 COORD ultiLocation;
 COORD enemyLocation[20];
+COORD deathLocation;
 COORD consoleSize;
+COORD nullLocation;
 bool createMissileL = 0;
 bool createMissileR = 0;
 bool createUlti = 0;
@@ -46,6 +48,9 @@ void init()
 
 	enemyLocation[0].X = 72; 
 	enemyLocation[0].Y = rand() % 20 + 2 ; 
+
+	nullLocation.X = '\0' ; 
+	nullLocation.Y = '\0' ; 
 
     elapsedTime = 0.0;
 }
@@ -140,7 +145,12 @@ void render()
 
 	gotoXY(35,0);
 	colour(0x0A);
-	std::cout << "Wave " << currentWave;
+	std::cout << "Wave " << currentWave; 
+
+	gotoXY(deathLocation); 
+	colour(0x7C); 
+	std::cout << "BOOM" ;
+	deathLocation = nullLocation ; 
 
 	gotoXY(17,0); 
 	colour(0x0C); 
@@ -270,6 +280,7 @@ void createEnemy()
 
 		if ( (enemyLocation[i].X <= missileRLocation.X && enemyLocation[i].Y == missileRLocation.Y) ) 
 		{ 
+			deathLocation = enemyLocation[i] ; 
 			enemyLocation[i].X = consoleSize.X - 5;
 			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++;
@@ -286,10 +297,11 @@ void createEnemy()
 
 		if (enemyLocation[i].X <= missileLLocation.X && enemyLocation[i].Y == missileLLocation.Y)
 		{
+			deathLocation = enemyLocation[i] ; 
 			enemyLocation[i].X = consoleSize.X - 5;
 			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++;
-
+ 
 			createMissileL = 0;
 			missileLLocation.X = charLocation.X;
 			missileLLocation.Y = charLocation.Y + 1;
