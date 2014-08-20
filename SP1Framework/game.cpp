@@ -45,7 +45,7 @@ void init()
     charLocation.Y = consoleSize.Y / 2;  
 
 	enemyLocation[0].X = 72; 
-	enemyLocation[0].Y = rand() % 20 + 1 ; 
+	enemyLocation[0].Y = rand() % 20 + 2 ; 
 
     elapsedTime = 0.0;
 }
@@ -76,12 +76,15 @@ void update(double dt)
 	if (score == (3*((currentWave*currentWave) + (3*currentWave))/2))
 	{
 		score--;
-		heart++;
+		if ( heart < 10)
+		{
+			heart++;
+		}
 		currentWave++;
 	}
 
     // Updating the location of the character based on the key press
-    if (keyPressed[K_UP] && charLocation.Y > 0)
+    if (keyPressed[K_UP] && charLocation.Y > 0 && charLocation.Y != 2)
     {
         charLocation.Y--; 
     }
@@ -124,9 +127,12 @@ void render()
     colour(0x0A);
     std::cout << 1.0 / deltaTime << "fps";
 	
-	gotoXY(55, 0);
-	colour(0x0A);
-	std::cout << "UltiBar " << ultiBar ;
+	gotoXY(15, 1);
+	colour(0x0B);
+	for (int i = 0; i < ultiBar/10; i++)
+	{
+		std::cout << char(4) << " ";
+	}
 
 	gotoXY(43,0); 
 	colour(0x0A);
@@ -137,7 +143,7 @@ void render()
 	std::cout << "Wave " << currentWave;
 
 	gotoXY(15,0); 
-	colour(0x0A); 
+	colour(0x0C); 
 	for (int i = 0; i < heart; i++)
 	{
 		std::cout << char(3) << " ";
@@ -238,7 +244,7 @@ void missile()
 
 void ulti()
 {
-	if (keyPressed[K_Z] && ultiBar == 20)
+	if (keyPressed[K_Z] && ultiBar == 50)
     {
 		createUlti = 1;
 	}
@@ -262,29 +268,49 @@ void createEnemy()
 	{
 		enemyLocation[i].X--;
 
-		if ( (enemyLocation[i].X < missileRLocation.X && enemyLocation[i].Y == missileRLocation.Y) || (enemyLocation[i].X < missileLLocation.X && enemyLocation[i].Y == missileLLocation.Y)) 
+		if ( (enemyLocation[i].X <= missileRLocation.X && enemyLocation[i].Y == missileRLocation.Y) ) 
 		{ 
 			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 1 ;
+			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++;
 
-			if (ultiBar < 20)
+			createMissileR = 0;
+			missileRLocation.X = charLocation.X + 10 ;
+			missileRLocation.Y = charLocation.Y + 1 ;
+
+			if (ultiBar < 50)
 			{
-				ultiBar ++;
+				ultiBar +=2;
 			}
 		} 
+
+		if (enemyLocation[i].X <= missileLLocation.X && enemyLocation[i].Y == missileLLocation.Y)
+		{
+			enemyLocation[i].X = consoleSize.X - 5;
+			enemyLocation[i].Y = rand() % 20 + 3 ;
+			score ++;
+
+			createMissileL = 0;
+			missileLLocation.X = charLocation.X;
+			missileLLocation.Y = charLocation.Y + 1;
+
+			if (ultiBar < 50)
+			{
+				ultiBar +=2;
+			}
+		}
 
 		if ( (enemyLocation[i].Y == ultiLocation.Y) ) 
 		{ 
 			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 1 ;
+			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++; 
 		} 
 
 		if (enemyLocation[i].X < 1 )
 		{
 			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 1;
+			enemyLocation[i].Y = rand() % 20 + 3;
 			heart--; 
 		}
 	}
