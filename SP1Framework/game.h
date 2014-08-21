@@ -1,7 +1,13 @@
 #ifndef _GAME_H
 #define _GAME_H
 
+#include <fstream>
+#include <sstream>
+#include <string> 
+#include <algorithm>
 #include "Framework\timer.h"
+
+using namespace::std;
 
 extern StopWatch g_timer;
 extern bool g_quitGame;
@@ -34,6 +40,7 @@ void shutdown();            // do clean up, free memory
 void missile();
 void ulti();
 void createEnemy();
+void updateScore();
 
 //render
 void renderUI();

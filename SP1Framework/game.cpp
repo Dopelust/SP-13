@@ -113,6 +113,7 @@ void update(double dt)
     // quits the game if player hits the escape key
     if (keyPressed[K_ESCAPE] || heart <= 0)
 	{
+		updateScore();
         g_quitGame = true;    
 	}
 
@@ -298,9 +299,9 @@ void renderUI()
 {
 	gotoXY(0, 0);
     colour(0x0F);
-    std::cout << elapsedTime << "Time" << std::endl;
+    std::cout << "Time: " << elapsedTime << std::endl;
 
-	gotoXY(14,0);
+	gotoXY(15,0);
 	colour(0x0F);
 	std::cout << "Wave " << currentWave;
 
@@ -317,6 +318,11 @@ void renderUI()
 	{
 		std::cout << char(4) << " ";
 	}
+	colour(0x01);
+	for (int i = 0; i < 5 - (ultiBar/10); i++)
+	{
+		std::cout << char(4) << " ";
+	}
 
 	gotoXY(38,1); 
 	colour(0x0F);
@@ -327,11 +333,11 @@ void renderUI()
 	}
 	if (currentWave == 6)
 	{
-		std::cout << "Score: ";
+		std::cout << "Wave 5 Complete! ";
 	}
 	if (currentWave == 11)
 	{
-		std::cout << "Score: ";
+		std::cout << "Wave 10 Complete! ";
 	}
 
 	gotoXY(50,0); 
@@ -380,4 +386,78 @@ void renderPlayer()
 	colour(0x0C);
 	std::cout << "--===>";
 
+}
+
+void updateScore()
+{
+	int scores[5];
+	int hscore[5];
+	int lowest = INT_MAX ; 
+	int highest = -1;
+	int a; 
+	int index = 0; 
+
+	ifstream Read;
+	ofstream Writein; 
+	string words ; 
+
+	Read.open ("highscores.txt" ) ;  
+
+	if (Read.is_open()) 
+	{ 
+		for ( int z = 0 ; z < 5 ; z++ ) 
+		{
+			getline(Read,words);
+			stringstream convert(words) ;
+			convert >> a ;  
+			scores[z] = a ; 
+		} 
+
+		for ( int k = 0 ; k < 5 ; k++ ) 
+		{ 
+			if ( scores[k] < lowest ) 
+			{ 
+				lowest = scores[k] ;
+				index = k ;
+			} 
+		}
+
+		if ( score > lowest ) 
+		{ 
+			scores[index] = score ; 
+		} 
+
+		for (int j = 0; j < 5; j++)
+		{
+			for ( int i = 0; i < 5; i++)
+			{
+				if (scores[i] > highest)
+				{
+					highest = scores[i];
+				}
+			}
+
+			for ( int i = 0; i < 5; i++)
+			{
+				if (scores[i] == highest)
+				{
+					hscore[j] = scores[i];
+					scores[i] = 0;
+					highest = 0;
+					break;
+				}
+			}
+		}
+
+		Writein.open ("highscores.txt" ); 
+
+		for (int i = 0; i < 5; i++)
+		{
+			Writein << hscore[i] << endl; 
+		}
+
+		Writein.close();
+		Read.close();
+
+	} 
 }
