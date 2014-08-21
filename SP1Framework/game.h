@@ -6,6 +6,12 @@
 extern StopWatch g_timer;
 extern bool g_quitGame;
 
+struct Boss
+{
+	COORD bossLocation;
+	COORD bossProjectile[8];
+};
+
 enum Keys
 {
     K_UP,
@@ -23,5 +29,14 @@ void getInput();            // get input from player
 void update(double dt);     // update the game and the state of the game
 void render();              // renders the current state of the game to the console
 void shutdown();            // do clean up, free memory
+
+//update
+void missile();
+void ulti();
+void createEnemy();
+
+//render
+void renderUI();
+void renderPlayer();
 
 #endif // _GAME_H

@@ -1,34 +1,40 @@
-﻿// This is the main file for the game logic and function
-//
-//
-#include "game.h"
+﻿#include "game.h"
 #include "Framework\console.h"
 #include <iostream>
 #include <iomanip>
 
-void missile();
-void ulti();
-void createEnemy();
-
+//Requisite
+COORD consoleSize;
 double elapsedTime;
 double deltaTime;
 bool keyPressed[K_COUNT];
+
+//Player
+int heart = 5;
+int score = 0; 
 COORD charLocation;
 COORD missileRLocation;
-COORD missileLLocation;
-COORD ultiLocation;
-COORD enemyLocation[20];
-COORD deathLocation;
-COORD consoleSize;
-COORD nullLocation;
-bool createMissileL = 0;
 bool createMissileR = 0;
+COORD missileLLocation;
+bool createMissileL = 0;
+COORD ultiLocation;
 bool createUlti = 0;
-int score = 0; 
-int heart = 5;
-int currentWave = 1;
 int ultiBar = 50;
-char b = 178;
+
+//Enemy
+int currentWave = 1;
+COORD enemyLocation[20];
+
+//Boss
+Boss Pink;
+Boss Zebra;
+
+//PowerUps
+bool laserSight = 0;
+
+//Misc
+COORD deathLocation;
+COORD nullLocation;
 
 void init()
 {
@@ -79,7 +85,7 @@ void update(double dt)
     elapsedTime += dt;
     deltaTime = dt;
 
-	if (score == (3*((currentWave*currentWave) + (3*currentWave))/2))
+	if (score >= (3*((currentWave*currentWave) + (3*currentWave))/2) && currentWave < 20)
 	{
 		score--;
 		if ( heart < 10)
@@ -118,85 +124,24 @@ void render()
     colour(0x0F);
     cls();
 
-    //render the game
-
-    //render test screen code (not efficient at all)
-	/*
-    const WORD colors[] =   {
-	                        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-	                        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6,
-							0xFA, 0xFB, 0xFC, 0xFD
-	                        };
-	*/
-    // render time taken to calculate this frame
-    gotoXY(70, 0);
-    colour(0x0A);
-    std::cout << 1.0 / deltaTime << "fps";
-	
-	gotoXY(17, 1);
-	colour(0x0B);
-	for (int i = 0; i < ultiBar/10; i++)
-	{
-		std::cout << char(4) << " ";
-	}
-
-	gotoXY(52,0); 
-	colour(0x0A);
-	std::cout << score << " score"; 
-
-	gotoXY(35,0);
-	colour(0x0A);
-	std::cout << "Wave " << currentWave; 
+	//player render
+    renderPlayer();
 
 	gotoXY(deathLocation); 
 	colour(0x7C); 
 	std::cout << "BOOM"; 
-	deathLocation = nullLocation ; 
-
-	gotoXY(17,0); 
-	colour(0x0C); 
-	for (int i = 0; i < heart; i++)
-	{
-		std::cout << char(3) << " ";
-	}
-
-    gotoXY(0, 0);
-    colour(0x09);
-    std::cout << elapsedTime << "Time" << std::endl;
-
-    // render character
-
+	deathLocation = nullLocation; 
+	
+    //renders the UI - hearts, wave number, etc.
+	renderUI();
+	
+	//enemy render
 	for ( int i = 0; i != currentWave; i++)
 	{
 		gotoXY(enemyLocation[i]); 
-		colour(0x0F); 
+		colour(0x02); 
 		std::cout << "Enemy" ; 
 	}
-
-    gotoXY(charLocation);
-    colour(0x09);
-    std::cout << "  /---\\_________" << std::endl;
-	std::cout << " |____________|_|";
-	if (createUlti == 1)
-	{
-		gotoXY(ultiLocation);
-		colour(0x0C);
-		for ( int i = 18; i < ultiLocation.X; i++)
-		{
-			std::cout << "=";
-		}
-		colour(0x09);
-	}
-	std::cout << std::endl << "  /===========\\" << std::endl ;
-	std::cout << "  \\_@_@_@_@_@_/";
-
-	gotoXY(missileRLocation);
-	colour(0x0C);  
-	std::cout << "--===>"; 
-
-	gotoXY(missileLLocation);
-	colour(0x0C);
-	std::cout << "--===>";
 
 }
 
@@ -219,7 +164,7 @@ void missile()
 
 	if (createMissileR == 1)
 	{
-		missileRLocation.X+=6;
+		missileRLocation.X+=8;
 
 		if (missileRLocation.X >= consoleSize.X - 5)
 		{
@@ -237,7 +182,7 @@ void missile()
 
 	if (createMissileL == 1)
 	{
-		missileLLocation.X+=6;
+		missileLLocation.X+=8;
 
 		if (missileLLocation.X >= consoleSize.X - 5)
 		{
@@ -264,7 +209,7 @@ void ulti()
 	if (createUlti == 1)
 	{
 		ultiLocation.X = consoleSize.X;
-		ultiLocation.Y = charLocation.Y + 2;
+		ultiLocation.Y = charLocation.Y + 1;
 		ultiBar--;
 
 		if (ultiBar == 0)
@@ -347,4 +292,92 @@ void createEnemy()
 		}
 	}
 	
+}
+
+void renderUI()
+{
+	gotoXY(0, 0);
+    colour(0x0F);
+    std::cout << elapsedTime << "Time" << std::endl;
+
+	gotoXY(14,0);
+	colour(0x0F);
+	std::cout << "Wave " << currentWave;
+
+	gotoXY(25,0); 
+	colour(0x0C); 
+	for (int i = 0; i < heart; i++)
+	{
+		std::cout << char(3) << " ";
+	}
+
+	gotoXY(25, 1);
+	colour(0x0B);
+	for (int i = 0; i < ultiBar/10; i++)
+	{
+		std::cout << char(4) << " ";
+	}
+
+	gotoXY(38,1); 
+	colour(0x0F);
+	if (currentWave == 2)
+	{
+		std::cout << "Wave 1 Complete! Laser Sight Installed.";
+		laserSight = true;
+	}
+	if (currentWave == 6)
+	{
+		std::cout << "Score: ";
+	}
+	if (currentWave == 11)
+	{
+		std::cout << "Score: ";
+	}
+
+	gotoXY(50,0); 
+	colour(0x0F);
+	std::cout << "Score: " << score;
+
+	gotoXY(70, 0);
+    colour(0x0F);
+    std::cout << 1.0 / deltaTime << "fps";
+}
+
+void renderPlayer()
+{
+
+	gotoXY(charLocation);
+    colour(0x07);
+    std::cout << "  /---\\_________" << std::endl;
+	std::cout << " |____________|_|";
+	if (createUlti == true)
+	{
+		gotoXY(ultiLocation);
+		colour(0x0B);
+		for ( int i = 18; i < ultiLocation.X; i++)
+		{
+			std::cout << "=";
+		}
+		colour(0x07);
+	}
+	else if (laserSight == true)
+	{
+		colour(0x04);
+		for ( int i = 18; i < consoleSize.X; i++)
+		{
+			std::cout << "-";
+		}
+		colour(0x07);
+	}
+	std::cout << std::endl << "  /===========\\" << std::endl ;
+	std::cout << "  \\_@_@_@_@_@_/";
+
+	gotoXY(missileRLocation);
+	colour(0x0C);  
+	std::cout << "--===>"; 
+
+	gotoXY(missileLLocation);
+	colour(0x0C);
+	std::cout << "--===>";
+
 }
