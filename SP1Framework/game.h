@@ -15,12 +15,13 @@ extern bool g_quitGame;
 struct Boss
 {
 	COORD bossLocation;
-	COORD bossProjectile[8];
+	COORD bossProjectile[10];
 	bool createBoss;
-	bool createProj[8];
-	bool move;
+	bool createProj[10];
+	int index;
 	bool moveUp;
 	bool moveDown;
+	int health;
 };
 
 enum Keys

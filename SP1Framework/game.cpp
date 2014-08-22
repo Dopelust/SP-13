@@ -10,13 +10,13 @@ double deltaTime;
 bool keyPressed[K_COUNT];
 
 //Player
-int heart = 5;
+int heart = 15;
 int score = 0; 
 COORD charLocation;
-COORD missileRLocation;
-bool createMissileR = 0;
-COORD missileLLocation;
-bool createMissileL = 0;
+COORD missileRLocation[2];
+bool createMissileR[2] = {0,0};
+COORD missileLLocation[2];
+bool createMissileL[2] = {0,0};
 COORD ultiLocation;
 bool createUlti = 0;
 int ultiBar = 50;
@@ -31,6 +31,7 @@ Boss Zebra;
 
 //PowerUps
 bool laserSight = 0;
+bool fourMissiles = 1;
 
 //Misc
 COORD deathLocation;
@@ -111,6 +112,7 @@ void update(double dt)
 
 	missile();
 	ulti();
+
 	createEnemy();
 	collisions();
 
@@ -129,16 +131,10 @@ void render()
     colour(0x0F);
     cls();
 
-	//player render
-    renderPlayer();
-
 	gotoXY(deathLocation); 
 	colour(0x7C); 
 	std::cout << "BOOM"; 
 	deathLocation = nullLocation; 
-	
-    //renders the UI - hearts, wave number, etc.
-	renderUI();
 	
 	//enemy render
 	if (currentWave % 5 != 0)
@@ -154,82 +150,108 @@ void render()
 	else if (currentWave == 5)
 	{
 		gotoXY(Pink.bossLocation); 
-		colour(0x7C); 
-		std::cout << "LLLLLLLLLLl"; 
+		colour(0x0D); 
+		std::cout << "Pink"; 
 
-		gotoXY(Pink.bossProjectile[0]); 
-		colour(0x7C); 
-		std::cout << "-"; 
+		for (int i = 0; i < Pink.index + 1; i++)
+		{
+			gotoXY(Pink.bossProjectile[i]); 
+			colour(0x0E); 
+			std::cout << "-"; 
+		}
 	}
 
-	else if (currentWave == 10)
-	{
-		gotoXY(deathLocation); 
-		colour(0x7C); 
-		std::cout << "BOOM"; 
-		deathLocation = nullLocation; 
-	}
-	
-	else if (currentWave == 15)
-	{
-		gotoXY(deathLocation); 
-		colour(0x7C); 
-		std::cout << "BOOM"; 
-		deathLocation = nullLocation; 
-	}
+	//player render
+    renderPlayer();
+
+	//renders the UI - hearts, wave number, etc.
+	renderUI();
 }
 
 void missile()
 {
+	//calls missile creation when space is pressed
 	if (keyPressed[K_SPACE])
     {
-		if (createMissileR == 0)
+		if (createMissileR[0] == 0)
 		{
-			//Beep(10,200);
-			createMissileR = 1;
+			createMissileR[0] = 1;
 		}
 
-		else if (createMissileR == 1 && createMissileL == 0)
+		else if (createMissileR[0] == 1)
 		{
-			//Beep(10,200);
-			createMissileL = 1;
+			createMissileL[0] = 1;
 		}
-	}
 
-	if (createMissileR == 1)
-	{
-		missileRLocation.X+=8;
-
-		if (missileRLocation.X >= consoleSize.X - 5)
+		else if (fourMissiles == 1)
 		{
-			createMissileR = 0;
-			missileRLocation.X = charLocation.X + 8;
-			missileRLocation.Y = charLocation.Y + 1;
-		}
-	}
+			if (createMissileL[0] == 1)
+			{
+				createMissileR[1] = 1;
+			}
 
-	else
-	{
-		missileRLocation.X = charLocation.X + 8 ;
-		missileRLocation.Y = charLocation.Y + 1 ;
-	}
-
-	if (createMissileL == 1)
-	{
-		missileLLocation.X+=8;
-
-		if (missileLLocation.X >= consoleSize.X - 5)
-		{
-			createMissileL = 0;
-			missileLLocation.X = charLocation.X + 2;
-			missileLLocation.Y = charLocation.Y + 1;
+			else if (createMissileR[1] == 1)
+			{	
+				createMissileL[1] = 1;
+			}
 		}
 	}
 
-	else
+	for (int i = 0; i < 2; i++)
 	{
-		missileLLocation.X = charLocation.X + 2;
-		missileLLocation.Y = charLocation.Y + 1;
+		//if create called
+		if (createMissileR[i] == 1)
+		{
+			missileRLocation[i].X+=8; //shot speed
+
+			if (missileRLocation[i].X >= consoleSize.X - 5) //if over the screen
+			{
+				createMissileR[i] = 0;
+				missileRLocation[i].X = charLocation.X + 8;
+				missileRLocation[i].Y = charLocation.Y + 1; //ready for fire again
+			}
+		}
+
+		//if create called
+		if (createMissileL[i] == 1)
+		{
+			missileLLocation[i].X+=8; //shot speed
+
+			if (missileLLocation[i].X >= consoleSize.X - 5) //if over the screen
+			{
+				createMissileL[i] = 0;
+				missileLLocation[i].X = charLocation.X + 8;
+				missileLLocation[i].Y = charLocation.Y + 1; //ready for fire again
+			}
+		}
+
+	}
+		
+	if (createMissileL[0] == 0)
+	{
+		missileLLocation[0].X = charLocation.X + 2;
+		missileLLocation[0].Y = charLocation.Y + 1; //follow the player
+	}
+	
+	if (createMissileR[0] == 0)
+	{
+		missileRLocation[0].X = charLocation.X + 8;
+		missileRLocation[0].Y = charLocation.Y + 1; //follow the player
+	}
+
+	if (fourMissiles == true)
+	{
+		if (createMissileL[1] == 0)
+		{
+			missileLLocation[1].X = charLocation.X + 2;
+			missileLLocation[1].Y = charLocation.Y + 1; //follow the player
+		}
+	
+		if (createMissileR[1] == 0)
+		{
+			missileRLocation[1].X = charLocation.X + 8;
+			missileRLocation[1].Y = charLocation.Y + 1; //follow the player
+		}
 	}
 }
 
@@ -251,143 +273,6 @@ void ulti()
 			createUlti = 0;
 		}
 	}
-}
-
-void createEnemy()
-{
-	if (currentWave % 5 != 0)
-	{
-		for ( int i = 0; i != currentWave; i++)
-		{
-			enemyLocation[i].X--;
-		}
-	}
-
-	else if (currentWave == 5 && Pink.createBoss == 0)
-	{
-		Pink.bossLocation.X = consoleSize.X - 10;
-		Pink.bossLocation.Y = consoleSize.Y / 2;
-
-		Pink.createBoss = 1;
-	}
-
-	if (Pink.createBoss == 1 )
-	{
-		if (Pink.bossLocation.X > consoleSize.X - 15)
-		{
-			Pink.bossLocation.X--;
-
-			if (Pink.bossLocation.X == consoleSize.X - 15)
-			{
-				Pink.bossProjectile[0] = Pink.bossLocation;
-				Pink.createProj[0] = true;
-				Pink.moveDown = true;
-			}
-		}
-
-		if (Pink.moveDown == true)
-		{
-			Pink.bossLocation.Y++;
-
-			if (Pink.bossLocation.Y == consoleSize.Y)
-			{
-				Pink.moveDown = false;
-				Pink.moveUp = true;
-			}
-		}
-
-		if (Pink.moveUp == true)
-		{
-			Pink.bossLocation.Y--;
-
-			if (Pink.bossLocation.Y == 0)
-			{
-				Pink.moveUp = false;
-				Pink.moveDown = true;
-			}
-		}
-
-		for (int i = 0; i < 8; i++)
-		{
-			if (Pink.createProj[i] == true)
-			{
-				Pink.bossProjectile[i].X--;
-			}
-		}
-	}
-}
-
-void collisions()
-{
-	for ( int i = 0; i != currentWave; i++)
-	{
-		if ( (enemyLocation[i].X <= missileRLocation.X && enemyLocation[i].Y == missileRLocation.Y) ) 
-		{ 
-			deathLocation = enemyLocation[i] ; 
-			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 3 ;
-			score ++;
-
-			createMissileR = 0;
-			missileRLocation.X = charLocation.X + 10 ;
-			missileRLocation.Y = charLocation.Y + 1 ;
-
-			if (ultiBar < 50)
-			{
-				ultiBar +=2;
-			}
-		} 
-
-		if (enemyLocation[i].X <= missileLLocation.X && enemyLocation[i].Y == missileLLocation.Y)
-		{
-			deathLocation = enemyLocation[i] ; 
-			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 3 ;
-			score ++;
- 
-			createMissileL = 0;
-			missileLLocation.X = charLocation.X;
-			missileLLocation.Y = charLocation.Y + 1;
-
-			if (ultiBar < 50)
-			{
-				ultiBar +=2;
-			}
-		}
-
-		if (enemyLocation[i].Y == ultiLocation.Y) 
-		{ 
-			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 3 ;
-			score ++; 
-		} 
-
-		if (enemyLocation[i].X < 1 )
-		{
-			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 3;
-			heart--; 
-		}
-
-		else if (enemyLocation[i].X < 18 )
-		{
-
-		for ( int j = 0 ; j < 17 ; j++ ) 
-		{ 
-			for ( int k = 0 ; k < 4 ; k++ ) 
-			{ 
-				if ( enemyLocation[i].X == charLocation.X + j && enemyLocation[i].Y == charLocation.Y + k)
-				{ 
-					enemyLocation[i].X = consoleSize.X - 5;
-					enemyLocation[i].Y = rand() % 20 + 3 ;
-					heart--; 
-				} 
-			} 
-		} 
-
-		}
-	}
-
 }
 
 void renderUI()
@@ -442,6 +327,13 @@ void renderUI()
 	gotoXY(70, 0);
     colour(0x0F);
     std::cout << 1.0 / deltaTime << "fps";
+
+	gotoXY(0, 23);
+	colour(0x04);
+	for (int i = 0; i < Pink.health; i++)
+	{
+		std::cout << "|";
+	}
 }
 
 void renderPlayer()
@@ -473,13 +365,16 @@ void renderPlayer()
 	std::cout << std::endl << "  /===========\\" << std::endl ;
 	std::cout << "  \\_@_@_@_@_@_/";
 
-	gotoXY(missileRLocation);
-	colour(0x0C);  
-	std::cout << "--===>"; 
+	for (int i = 0; i < 2; i ++)
+	{
+		gotoXY(missileRLocation[i]);
+		colour(0x0C);  
+		std::cout << "--===>"; 
 
-	gotoXY(missileLLocation);
-	colour(0x0C);
-	std::cout << "--===>";
+		gotoXY(missileLLocation[i]);
+		colour(0x0C);
+		std::cout << "--===>";
+	}
 
 }
 
