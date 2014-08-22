@@ -9,6 +9,8 @@ bool g_quitGame = false;      // Set to true if you want to quit the game
 const unsigned char FPS = 10; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 
+bool g_playGame = 1;
+
 void mainLoop();
 
 // TODO:
@@ -16,10 +18,15 @@ void mainLoop();
 
 int main()
 {
+	while (!g_playGame)
+	{
+		menu();
+	}
+
 	init();      // initialize your variables
-    mainLoop();  // main loop
-    shutdown();  // do clean up, if any. free memory.
-	
+	mainLoop();  // main loop
+	shutdown();  // do clean up, if any. free memory.
+
 	return 0;
 }
 

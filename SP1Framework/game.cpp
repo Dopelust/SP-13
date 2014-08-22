@@ -22,7 +22,7 @@ bool createUlti = 0;
 int ultiBar = 50;
 
 //Enemy
-int currentWave = 1;
+int currentWave = 5;
 COORD enemyLocation[20];
 
 //Boss
@@ -93,6 +93,9 @@ void update(double dt)
 			heart++;
 		}
 		currentWave++;
+
+		enemyLocation[currentWave-1].X = consoleSize.X - 5;
+		enemyLocation[currentWave-1].Y = rand() % 20 + 3 ;
 	}
 
     // Updating the location of the character based on the key press
@@ -109,6 +112,7 @@ void update(double dt)
 	missile();
 	ulti();
 	createEnemy();
+	collisions();
 
     // quits the game if player hits the escape key
     if (keyPressed[K_ESCAPE] || heart <= 0)
@@ -137,13 +141,42 @@ void render()
 	renderUI();
 	
 	//enemy render
-	for ( int i = 0; i != currentWave; i++)
+	if (currentWave % 5 != 0)
 	{
-		gotoXY(enemyLocation[i]); 
-		colour(0x02); 
-		std::cout << "Enemy" ; 
+		for ( int i = 0; i != currentWave; i++)
+		{
+			gotoXY(enemyLocation[i]); 
+			colour(0x02); 
+			std::cout << "Enemy" ; 
+		}
+	}
+	
+	else if (currentWave == 5)
+	{
+		gotoXY(Pink.bossLocation); 
+		colour(0x7C); 
+		std::cout << "LLLLLLLLLLl"; 
+
+		gotoXY(Pink.bossProjectile[0]); 
+		colour(0x7C); 
+		std::cout << "-"; 
 	}
 
+	else if (currentWave == 10)
+	{
+		gotoXY(deathLocation); 
+		colour(0x7C); 
+		std::cout << "BOOM"; 
+		deathLocation = nullLocation; 
+	}
+	
+	else if (currentWave == 15)
+	{
+		gotoXY(deathLocation); 
+		colour(0x7C); 
+		std::cout << "BOOM"; 
+		deathLocation = nullLocation; 
+	}
 }
 
 void missile()
@@ -222,10 +255,72 @@ void ulti()
 
 void createEnemy()
 {
+	if (currentWave % 5 != 0)
+	{
+		for ( int i = 0; i != currentWave; i++)
+		{
+			enemyLocation[i].X--;
+		}
+	}
+
+	else if (currentWave == 5 && Pink.createBoss == 0)
+	{
+		Pink.bossLocation.X = consoleSize.X - 10;
+		Pink.bossLocation.Y = consoleSize.Y / 2;
+
+		Pink.createBoss = 1;
+	}
+
+	if (Pink.createBoss == 1 )
+	{
+		if (Pink.bossLocation.X > consoleSize.X - 15)
+		{
+			Pink.bossLocation.X--;
+
+			if (Pink.bossLocation.X == consoleSize.X - 15)
+			{
+				Pink.bossProjectile[0] = Pink.bossLocation;
+				Pink.createProj[0] = true;
+				Pink.moveDown = true;
+			}
+		}
+
+		if (Pink.moveDown == true)
+		{
+			Pink.bossLocation.Y++;
+
+			if (Pink.bossLocation.Y == consoleSize.Y)
+			{
+				Pink.moveDown = false;
+				Pink.moveUp = true;
+			}
+		}
+
+		if (Pink.moveUp == true)
+		{
+			Pink.bossLocation.Y--;
+
+			if (Pink.bossLocation.Y == 0)
+			{
+				Pink.moveUp = false;
+				Pink.moveDown = true;
+			}
+		}
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (Pink.createProj[i] == true)
+			{
+				Pink.bossProjectile[i].X--;
+			}
+		}
+	}
+}
+
+void collisions()
+{
 	for ( int i = 0; i != currentWave; i++)
 	{
-		enemyLocation[i].X--;
-
 		if ( (enemyLocation[i].X <= missileRLocation.X && enemyLocation[i].Y == missileRLocation.Y) ) 
 		{ 
 			deathLocation = enemyLocation[i] ; 
@@ -292,7 +387,7 @@ void createEnemy()
 
 		}
 	}
-	
+
 }
 
 void renderUI()

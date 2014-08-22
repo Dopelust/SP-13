@@ -16,6 +16,11 @@ struct Boss
 {
 	COORD bossLocation;
 	COORD bossProjectile[8];
+	bool createBoss;
+	bool createProj[8];
+	bool move;
+	bool moveUp;
+	bool moveDown;
 };
 
 enum Keys
@@ -30,6 +35,20 @@ enum Keys
 	K_Z
 };
 
+enum Option
+{
+	blank,
+	Start,
+	Options,
+	Rules,
+	HighScore,
+	Credits,
+	Exit,
+};
+
+void menu();
+void gameMenu(int x);
+
 void init();                // initialize your variables, allocate memory, etc
 void getInput();            // get input from player
 void update(double dt);     // update the game and the state of the game
@@ -40,6 +59,7 @@ void shutdown();            // do clean up, free memory
 void missile();
 void ulti();
 void createEnemy();
+void collisions();
 void updateScore();
 
 //render
