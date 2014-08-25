@@ -30,8 +30,9 @@ void createEnemy()
 	{
 		if (currentWave % 5 != 0)
 		{
-			enemy = rand() % 15 + 1 ; 
-			if ( enemy == 1 && spawnenemy[i] == 0 ) 
+			enemy = rand() % 15 + 1;
+
+			if ( enemy == 2 && spawnenemy[i] == 0 ) 
 			{ 
 				spawnenemy[i] = 1 ; 
 				enemyLocation[i].X = consoleSize.X - 5; //new spawn location
@@ -137,7 +138,7 @@ void collisions()
 	//ulti collisions
 	if (Pink.bossLocation.Y == ultiLocation.Y)
 	{
-		Pink.health -=10;
+		Pink.health -=5;
 	}
 
 	//missile collisions
@@ -146,11 +147,11 @@ void collisions()
 		//collision with Codename Pink	
 		if (( Pink.bossLocation.X <= missileRLocation[j].X) && (Pink.bossLocation.Y == missileRLocation[j].Y))
 		{
-			Pink.health -=5;
+			Pink.health -=2;
 		}
 		if (( Pink.bossLocation.X <= missileLLocation[j].X) && (Pink.bossLocation.Y == missileLLocation[j].Y))
 		{
-			Pink.health -=5;
+			Pink.health -=2;
 			break;
 		}
 		//collision with enemies

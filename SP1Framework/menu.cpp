@@ -3,11 +3,12 @@
 #include <iostream>
 #include <iomanip>
 
-
 using namespace::std;
 
+COORD pointerLocation;
 extern bool g_playGame;
 char P;
+
 void menu()
 {
 	system("cls");
@@ -176,4 +177,33 @@ void gameMenu(int x)
 		}
 		break;
 	}
+}
+
+void pause()
+{
+	system ("cls");
+	cout << " Game Paused! " << endl;
+	cout << "1. Resume " <<endl;
+	cout << "2. Main Menu" << endl;
+	cout << "3. Quit" << endl;
+	int u;
+	cin >> u;
+
+	if ( u < 4 && u>0 ) 
+	{
+		system("cls") ; 
+
+		switch(u)
+		{
+			//Game Start
+		case 1 :
+			break;
+			//Options
+		case 2: g_playGame = false;
+			menu();
+			break;
+		case 3 : g_quitGame = true;
+			break;
+		}
+	} 
 }

@@ -49,6 +49,7 @@ enum Option
 
 void menu();
 void gameMenu(int x);
+void pause();
 
 void init();                // initialize your variables, allocate memory, etc
 void getInput();            // get input from player

@@ -9,10 +9,11 @@ double elapsedTime;
 double deltaTime;
 bool keyPressed[K_COUNT];
 extern void Inmenu();
+
 //Player
-int heart = 5;
-int score = 0; 
 string names;
+int heart = 15;
+int score = 45; 
 COORD charLocation;
 COORD missileRLocation[2];
 bool createMissileR[2] = {0,0};
@@ -23,7 +24,7 @@ bool createUlti = 0;
 int ultiBar = 50;
 
 //Enemy
-int currentWave = 1;
+int currentWave = 5;
 bool spawnenemy[20] ; 
 COORD enemyLocation[20];
 
@@ -32,8 +33,8 @@ Boss Pink;
 Boss Zebra;
 
 //PowerUps
-bool laserSight = 0;
-bool fourMissiles = 0;
+bool laserSight = 1;
+bool fourMissiles = 1;
 
 //Misc
 COORD deathLocation;
@@ -113,14 +114,16 @@ void update(double dt)
 	collisions();
 
     // quits the game if player hits the escape key
-    if (keyPressed[K_ESCAPE] )
+    if (keyPressed[K_ESCAPE])
 	{
-		Inmenu();
+		pause();
 	}
-	if ( heart == 0)
+
+	if ( heart < 0)
 	{
 		cin >> names;
 		updateScore();
+		g_quitGame = 1; 
 	}
 
 }
@@ -140,20 +143,17 @@ void render()
     renderPlayer();
 
 	//enemy render
-	if (currentWave % 5 != 0)
+	for ( int i = 0; i != currentWave; i++)
 	{
-		for ( int i = 0; i != currentWave; i++)
-		{
-			if ( spawnenemy[i] == 1 ) 
-			{ 
+		if ( spawnenemy[i] == 1 ) 
+		{ 
 			gotoXY(enemyLocation[i]); 
 			colour(0x02); 
 			std::cout << "Enemy" ; 
-			}
 		}
 	}
 	
-	else if (currentWave == 5)
+	if (currentWave == 5)
 	{
 		gotoXY(Pink.bossLocation); 
 		colour(0x0D); 
