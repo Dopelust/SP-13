@@ -51,6 +51,9 @@ void menu()
 
 void gameMenu(int x)
 {
+	ifstream Read;
+	string words ; 
+	Read.open ("highscores.txt" ) ;
 	system("cls") ; 
 	switch(x)
 	{
@@ -75,7 +78,18 @@ void gameMenu(int x)
 		}
 		break;
 		// HighScore
-	case 3: cout <<"                          Welcome to the Hall of Fame! "<< endl;
+	case 3: cout <<"                          Welcome to the Hall of Fame! "<< endl; 
+		if (Read.is_open()) 
+		{ 
+			for ( int z = 0 ; z < 5 ; z++ ) 
+			{
+				getline(Read,words);
+				cout << words << endl ; 
+			}
+
+		}
+
+
 		cout <<"                        ----Return to Main Menu ? (Y/N) -----"<< endl;
 		cin >> P;
 		if(P =='Y' || P=='y')
