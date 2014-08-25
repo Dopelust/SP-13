@@ -13,7 +13,7 @@ extern COORD consoleSize;
 //Enemy
 extern int currentWave;
 extern COORD enemyLocation[20];
-bool spawnenemy[20] ; 
+extern bool spawnenemy[20] ; 
 int enemy = 0 ; 
 //Boss
 extern Boss Pink;
@@ -29,10 +29,12 @@ void createEnemy()
 	{
 		for ( int i = 0; i != currentWave; i++)
 		{
-			enemy = rand() % 20 + 1 ; 
-			if ( enemy == 1 ) 
+			enemy = rand() % 15 + 1 ; 
+			if ( enemy == 1 && spawnenemy[i] == 0 ) 
 			{ 
 				spawnenemy[i] = 1 ; 
+				enemyLocation[i].X = consoleSize.X - 5; //new spawn location
+				enemyLocation[i].Y = rand() % 20 + 3 ;
 			} 
 			if ( spawnenemy[i] == 1 ) 
 			{ 
@@ -40,9 +42,8 @@ void createEnemy()
 			} 
 			if ( spawnenemy[i] != 1 ) 
 			{ 
-				enemyLocation[i].X = 0 ;
-				enemyLocation[i].Y = 0 ;
-				score--; 
+				enemyLocation[i].X = 1 ;
+				enemyLocation[i].Y = 1 ;
 			} 
 			
 		}
@@ -154,8 +155,6 @@ void collisions()
 		{ 
 			spawnenemy[i] = 0 ; 
 			deathLocation = enemyLocation[i]; //death animation
-			enemyLocation[i].X = consoleSize.X - 5; //new spawn location
-			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++; //score increase
 
 			createMissileR[j] = 0; //reset missile position
@@ -172,8 +171,6 @@ void collisions()
 		{
 			spawnenemy[i] = 0 ; 
 			deathLocation = enemyLocation[i] ; 
-			enemyLocation[i].X = consoleSize.X - 5;
-			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++;
  
 			createMissileL[j] = 0;
@@ -190,8 +187,6 @@ void collisions()
 		if (enemyLocation[i].Y == ultiLocation.Y) 
 		{ 
 			spawnenemy[i] = 0 ;
-			enemyLocation[i].X = consoleSize.X - 5; 
-			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++; 
 		} 
 
@@ -202,6 +197,7 @@ void collisions()
 			enemyLocation[i].Y = rand() % 20 + 3;
 			heart--; 
 		}
+		 
 
 		//player collision
 		else if (enemyLocation[i].X < 18 )

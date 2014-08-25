@@ -23,6 +23,7 @@ int ultiBar = 50;
 
 //Enemy
 int currentWave = 1;
+bool spawnenemy[20] ; 
 COORD enemyLocation[20];
 
 //Boss
@@ -144,9 +145,12 @@ void render()
 	{
 		for ( int i = 0; i != currentWave; i++)
 		{
+			if ( spawnenemy[i] == 1 ) 
+			{ 
 			gotoXY(enemyLocation[i]); 
 			colour(0x02); 
 			std::cout << "Enemy" ; 
+			}
 		}
 	}
 	
