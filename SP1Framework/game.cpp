@@ -10,8 +10,8 @@ double deltaTime;
 bool keyPressed[K_COUNT];
 
 //Player
-int heart = 5;
-int score = 0; 
+int heart = 15;
+int score = 20; 
 COORD charLocation;
 COORD missileRLocation[2];
 bool createMissileR[2] = {0,0};
@@ -22,7 +22,7 @@ bool createUlti = 0;
 int ultiBar = 50;
 
 //Enemy
-int currentWave = 1;
+int currentWave = 4;
 bool spawnenemy[20] ; 
 COORD enemyLocation[20];
 
@@ -54,9 +54,6 @@ void init()
     // set the character to be in the center of the screen.
     charLocation.X = 0;
     charLocation.Y = consoleSize.Y / 2;  
-
-	enemyLocation[0].X = 72; 
-	enemyLocation[0].Y = rand() % 20 + 2 ; 
 
 	nullLocation.X = '\0' ; 
 	nullLocation.Y = '\0' ; 
@@ -95,8 +92,6 @@ void update(double dt)
 			heart++;
 		}
 		currentWave++;
-		enemyLocation[currentWave-1].X = consoleSize.X - 5;
-		enemyLocation[currentWave-1].Y = rand() % 20 + 3 ;	
 	}
 
     // Updating the location of the character based on the key press

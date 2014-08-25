@@ -25,9 +25,10 @@ extern COORD nullLocation;
 void createEnemy()
 {
 	//normal waves
-	if (currentWave % 5 != 0)
+
+	for ( int i = 0; i != currentWave; i++)
 	{
-		for ( int i = 0; i != currentWave; i++)
+		if (currentWave % 5 != 0)
 		{
 			enemy = rand() % 15 + 1 ; 
 			if ( enemy == 1 && spawnenemy[i] == 0 ) 
@@ -36,21 +37,23 @@ void createEnemy()
 				enemyLocation[i].X = consoleSize.X - 5; //new spawn location
 				enemyLocation[i].Y = rand() % 20 + 3 ;
 			} 
-			if ( spawnenemy[i] == 1 ) 
-			{ 
-			enemyLocation[i].X--;
-			} 
-			if ( spawnenemy[i] != 1 ) 
-			{ 
-				enemyLocation[i].X = 1 ;
-				enemyLocation[i].Y = 1 ;
-			} 
-			
 		}
+
+		if ( spawnenemy[i] == 1 ) 
+		{ 
+			enemyLocation[i].X--;
+		} 
+
+		if ( spawnenemy[i] != 1 ) 
+		{ 
+			enemyLocation[i].X = 1 ;
+			enemyLocation[i].Y = 1 ;
+		} 
+			
 	}
 
 	//wave 5 - Codename Pink
-	else if (currentWave == 5 && Pink.createBoss == 0)
+	if (currentWave == 5 && Pink.createBoss == 0)
 	{
 		Pink.bossLocation.X = consoleSize.X - 2;
 		Pink.bossLocation.Y = consoleSize.Y / 2;

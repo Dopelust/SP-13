@@ -8,7 +8,7 @@ bool g_quitGame = false;      // Set to true if you want to quit the game
 const unsigned char FPS = 10; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 
-bool g_playGame = 0;
+bool g_playGame = 1;
 
 void mainLoop();
 
