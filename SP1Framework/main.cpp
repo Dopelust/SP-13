@@ -3,6 +3,7 @@
 #include "Framework\timer.h"
 #include "Framework\console.h"
 #include "game.h"
+#include "Framework\console.h"
 #include <iostream>
 using std::cin;
 
