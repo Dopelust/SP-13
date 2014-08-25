@@ -1,15 +1,17 @@
-#include "Framework\timer.h"
 #include "game.h"
+#include "Framework\console.h"
 #include <iostream>
+#include <iomanip>
+
 
 using namespace::std;
 
 extern bool g_playGame;
 char P;
-
 void menu()
 {
 	system("cls");
+	colour(0x0A);
 	cout<<" ###       ###        #######                       #####  ######          ### "<<endl;
 	cout<<"  #  ##### ###  ####  #     # #    # ###### #####  #     # #     # # ##### ### "<<endl;
 	cout<<"  #    #    #  #      #     # #    # #      #    # #     # #     # #   #   ###"<<endl;
@@ -38,7 +40,9 @@ void menu()
 
 	else if ( x == Exit )  
 	{ 
-		cout << "Closing Application" << endl ; 
+		colour(0x0C);
+		cout << "Closing Application" << endl ;
+		colour(0x07);
 		exit(1); 
 	} 
 
@@ -70,10 +74,12 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			exit(1);
 			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
+			exit(1);
 			cout <<" Error unknown input" <<endl;
 		}
 		break;
@@ -83,13 +89,12 @@ void gameMenu(int x)
 		{ 
 			for ( int z = 0 ; z < 5 ; z++ ) 
 			{
+				colour(0x0F);
 				getline(Read,words);
 				cout << words << endl ; 
 			}
 
 		}
-
-
 		cout <<"                        ----Return to Main Menu ? (Y/N) -----"<< endl;
 		cin >> P;
 		if(P =='Y' || P=='y')
@@ -98,18 +103,22 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			exit(1);
 			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
+			exit(1);
 			cout <<" Error unknown input" <<endl;
 		}
 		break;
 		//Rules
-	case 4: cout << "                         Rules are simple: "<< endl;
-		cout << "                         1: Defend your base (5 lives) "<< endl;
-		cout << "                         2: Space to shoot rockets to defend "<<endl;
-		cout << "                         3: Arrow keys to move up and down" << endl << endl;
+	case 4: cout << "                         Rules are simple: "<< endl<<endl;
+		cout << "   1: Defend your base (5 lives) "<< endl;
+		cout << "   2: Space to shoot rockets to defend "<<endl;
+		cout << "   3: Arrow keys to move up and down" << endl;
+		cout << "   4: Press Z to fire your laser!(Has cooldown)" << endl;
+		cout << "   5: For every wave you clear, you will recieve 1 extra heart (10 total)" << endl<< endl;
 		cout << "                         -----Return to menu? (Y/N)-----" <<endl <<endl;
 		cin >> P;
 		if(P =='Y' || P=='y')
@@ -118,10 +127,12 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			exit(1);
 			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
+			exit(1);
 			cout <<" Error unknown input" <<endl;
 		}
 		break;
@@ -134,10 +145,12 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			exit(1);
 			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
+			exit(1);
 			cout <<" Error unknown input" <<endl;
 		}
 		break;
