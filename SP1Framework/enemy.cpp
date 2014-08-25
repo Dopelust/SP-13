@@ -13,6 +13,8 @@ extern COORD consoleSize;
 //Enemy
 extern int currentWave;
 extern COORD enemyLocation[20];
+bool spawnenemy[20] ; 
+int enemy = 0 ; 
 //Boss
 extern Boss Pink;
 extern Boss Zebra;
@@ -27,7 +29,22 @@ void createEnemy()
 	{
 		for ( int i = 0; i != currentWave; i++)
 		{
+			enemy = rand() % 20 + 1 ; 
+			if ( enemy == 1 ) 
+			{ 
+				spawnenemy[i] = 1 ; 
+			} 
+			if ( spawnenemy[i] == 1 ) 
+			{ 
 			enemyLocation[i].X--;
+			} 
+			if ( spawnenemy[i] != 1 ) 
+			{ 
+				enemyLocation[i].X = 0 ;
+				enemyLocation[i].Y = 0 ;
+				score--; 
+			} 
+			
 		}
 	}
 
@@ -135,6 +152,7 @@ void collisions()
 
 		if ( (enemyLocation[i].X <= missileRLocation[j].X && enemyLocation[i].Y == missileRLocation[j].Y) ) //if collide
 		{ 
+			spawnenemy[i] = 0 ; 
 			deathLocation = enemyLocation[i]; //death animation
 			enemyLocation[i].X = consoleSize.X - 5; //new spawn location
 			enemyLocation[i].Y = rand() % 20 + 3 ;
@@ -152,6 +170,7 @@ void collisions()
 
 		if (enemyLocation[i].X <= missileLLocation[j].X && enemyLocation[i].Y == missileLLocation[j].Y)
 		{
+			spawnenemy[i] = 0 ; 
 			deathLocation = enemyLocation[i] ; 
 			enemyLocation[i].X = consoleSize.X - 5;
 			enemyLocation[i].Y = rand() % 20 + 3 ;
@@ -170,6 +189,7 @@ void collisions()
 		//ulti collisions
 		if (enemyLocation[i].Y == ultiLocation.Y) 
 		{ 
+			spawnenemy[i] = 0 ;
 			enemyLocation[i].X = consoleSize.X - 5; 
 			enemyLocation[i].Y = rand() % 20 + 3 ;
 			score ++; 
@@ -177,6 +197,7 @@ void collisions()
 
 		if (enemyLocation[i].X < 1 )
 		{
+			spawnenemy[i] = 0 ;
 			enemyLocation[i].X = consoleSize.X - 5;
 			enemyLocation[i].Y = rand() % 20 + 3;
 			heart--; 
@@ -192,6 +213,7 @@ void collisions()
 			{ 
 				if ( enemyLocation[i].X == charLocation.X + j && enemyLocation[i].Y == charLocation.Y + k) //if collide
 				{ 
+					spawnenemy[i] = 0 ;
 					enemyLocation[i].X = consoleSize.X - 5; //new spawn location
 					enemyLocation[i].Y = rand() % 20 + 3 ;
 					heart--; //heart decrease

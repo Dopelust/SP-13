@@ -136,6 +136,9 @@ void render()
 	std::cout << "BOOM"; 
 	deathLocation = nullLocation; 
 	
+	//player render
+    renderPlayer();
+
 	//enemy render
 	if (currentWave % 5 != 0)
 	{
@@ -161,8 +164,6 @@ void render()
 		}
 	}
 
-	//player render
-    renderPlayer();
 
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
