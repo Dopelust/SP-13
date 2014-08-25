@@ -10,8 +10,8 @@ double deltaTime;
 bool keyPressed[K_COUNT];
 
 //Player
-int heart = 15;
-int score = 20; 
+int heart = 5;
+int score = 0; 
 string names;
 COORD charLocation;
 COORD missileRLocation[2];
@@ -23,7 +23,7 @@ bool createUlti = 0;
 int ultiBar = 50;
 
 //Enemy
-int currentWave = 4;
+int currentWave = 1;
 bool spawnenemy[20] ; 
 COORD enemyLocation[20];
 
@@ -32,8 +32,8 @@ Boss Pink;
 Boss Zebra;
 
 //PowerUps
-bool laserSight = 1;
-bool fourMissiles = 1;
+bool laserSight = 0;
+bool fourMissiles = 0;
 
 //Misc
 COORD deathLocation;
