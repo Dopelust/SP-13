@@ -94,7 +94,7 @@ void gameMenu(int x)
 	case 3: cout <<"                                 Top Highscores! "<< endl; 
 		if (Read.is_open() && Read2.is_open()) 
 		{ 
-			for ( int z = 0 ; z < 5 ; z++ ) 
+			for ( int z = 0 ; z < 5 ; z++ )  
 			{
 				colour(0x0F);
 				getline(Read,words);

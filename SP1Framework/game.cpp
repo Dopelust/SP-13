@@ -8,7 +8,7 @@ COORD consoleSize;
 double elapsedTime;
 double deltaTime;
 bool keyPressed[K_COUNT];
-
+extern void Inmenu();
 //Player
 int heart = 5;
 int score = 0; 
@@ -113,11 +113,14 @@ void update(double dt)
 	collisions();
 
     // quits the game if player hits the escape key
-    if (keyPressed[K_ESCAPE] || heart <= 0)
+    if (keyPressed[K_ESCAPE] )
+	{
+		Inmenu();
+	}
+	if ( heart == 0)
 	{
 		cin >> names;
 		updateScore();
-        g_quitGame = true;    
 	}
 
 }
