@@ -121,9 +121,20 @@ void update(double dt)
 
 	if ( heart < 0)
 	{
+	colour(0x0A);
+		system ("cls");
+		cout << ""<< endl;
+		cout << "   ______                             ___                        "<< endl; 
+		cout << " .' ___  |                          .'   `.                      "<< endl;
+        cout << "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  "<< endl;
+		cout <<" | |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] "<< endl;
+		cout << "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    "<< endl;
+		cout << " `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  "<< endl << endl;
+		cout << " Please enter your name : " ;
 		cin >> names;
+		system ("cls");
 		updateScore();
-		g_quitGame = 1; 
+		g_quitGame= true;
 	}
 
 }
