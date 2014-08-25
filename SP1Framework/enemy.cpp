@@ -19,6 +19,7 @@ int enemy = 0 ;
 extern Boss Pink;
 extern Boss Zebra;
 //Misc
+extern bool fourMissiles;
 extern COORD deathLocation;
 extern COORD nullLocation;
 
@@ -72,6 +73,7 @@ void createEnemy()
 		{
 			score+=18;
 			Pink.createBoss = 0;
+			fourMissiles = 1;
 		}
 
 		if (Pink.bossLocation.X > consoleSize.X - 15)//entering the frame
@@ -110,7 +112,7 @@ void createEnemy()
 		//Shoots projectiles when moving up and down
 		if (Pink.moveDown == true || Pink.moveUp == true)
 		{
-			if (Pink.index < 8) //index uniquely identifies each projectile, up to a maximum of 8
+			if (Pink.index < 12) //index uniquely identifies each projectile, up to a maximum of 8
 			{
 				//create or spawns in a projectile, frame by frame
 				Pink.createProj[Pink.index] = true; 
@@ -144,7 +146,7 @@ void createEnemy()
 				break;
 			}
 
-			if (i == 7)
+			if (i == Pink.index-1)
 			{
 				Pink.index = 0;
 			}
@@ -195,6 +197,7 @@ void collisions()
 		}
 
 		}
+
 		//With Ulti
 		if (enemyLocation[i].Y == ultiLocation.Y) 
 		{ 
@@ -209,7 +212,6 @@ void collisions()
 			enemyLocation[i].Y = rand() % 20 + 3;
 			heart--; 
 		}
-		 
 
 		//With Player
 		else if (enemyLocation[i].X < 18 )
@@ -232,7 +234,7 @@ void collisions()
 		}
 	}
 
-	//Boss #1 Collisions
+	//Boss #1 (Pink) Collisions
 	if (Pink.createBoss == 1)
 	{
 		//Pink's Hitbox
@@ -245,13 +247,13 @@ void collisions()
 					//Missile Collisions
 					if (( Pink.bossLocation.X + j <= missileRLocation[i].X) && (Pink.bossLocation.Y + k == missileRLocation[i].Y))
 					{
-						Pink.health -=4;
+						Pink.health -=2;
 						createMissileR[i] = 0;
 					}
 
 					if (( Pink.bossLocation.X + j <= missileLLocation[i].X) && (Pink.bossLocation.Y + k == missileLLocation[i].Y))
 					{
-						Pink.health -=4;
+						Pink.health -=2;
 						createMissileL[i] = 0;
 					}
 

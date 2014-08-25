@@ -15,9 +15,9 @@ extern bool g_quitGame;
 struct Boss
 {
 	COORD bossLocation;
-	COORD bossProjectile[10];
+	COORD bossProjectile[12];
 	bool createBoss;
-	bool createProj[10];
+	bool createProj[12];
 	int index;
 	bool moveUp;
 	bool moveDown;

@@ -12,7 +12,7 @@ extern void Inmenu();
 
 //Player
 string names;
-int heart = 15;
+int heart = 5;
 int score = 45; 
 COORD charLocation;
 COORD missileRLocation[2];
@@ -34,7 +34,7 @@ Boss Zebra;
 
 //PowerUps
 bool laserSight = 1;
-bool fourMissiles = 1;
+bool fourMissiles = 0;
 
 //Misc
 COORD deathLocation;
