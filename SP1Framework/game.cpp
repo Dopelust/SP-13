@@ -10,7 +10,7 @@ double deltaTime;
 bool keyPressed[K_COUNT];
 
 //Player
-int heart = 15;
+int heart = 5;
 int score = 0; 
 COORD charLocation;
 COORD missileRLocation[2];
