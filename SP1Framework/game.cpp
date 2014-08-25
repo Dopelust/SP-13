@@ -12,6 +12,7 @@ bool keyPressed[K_COUNT];
 //Player
 int heart = 15;
 int score = 20; 
+string names;
 COORD charLocation;
 COORD missileRLocation[2];
 bool createMissileR[2] = {0,0};
@@ -114,6 +115,7 @@ void update(double dt)
     // quits the game if player hits the escape key
     if (keyPressed[K_ESCAPE] || heart <= 0)
 	{
+		cin >> names;
 		updateScore();
         g_quitGame = true;    
 	}
@@ -378,22 +380,32 @@ void renderPlayer()
 
 }
 
+//highscore
 void updateScore()
 {
 	int scores[5];
 	int hscore[5];
+	string hname[5];
+	string namae[5];
 	int lowest = INT_MAX ; 
 	int highest = -1;
+	string topnames;
 	int a; 
 	int index = 0; 
 
 	ifstream Read;
+	ifstream Read2;
 	ofstream Writein; 
-	string words ; 
+	ofstream Writeinto; 
+	string words ;
+	string b;
+	
 
 	Read.open ("highscores.txt" ) ;  
+	Read2.open ("highscorename.txt" ) ;  
 
-	if (Read.is_open()) 
+
+	if (Read.is_open() && Read2.is_open() )
 	{ 
 		for ( int z = 0 ; z < 5 ; z++ ) 
 		{
@@ -401,7 +413,12 @@ void updateScore()
 			stringstream convert(words) ;
 			convert >> a ;  
 			scores[z] = a ; 
+
+			//names
+			getline(Read2,b);
+			hname[z] = b;
 		} 
+
 
 		for ( int k = 0 ; k < 5 ; k++ ) 
 		{ 
@@ -411,10 +428,11 @@ void updateScore()
 				index = k ;
 			} 
 		}
-
+		//replace
 		if ( score > lowest ) 
 		{ 
 			scores[index] = score ; 
+			hname[index] = names;
 		} 
 
 		for (int j = 0; j < 5; j++)
@@ -424,7 +442,9 @@ void updateScore()
 				if (scores[i] > highest)
 				{
 					highest = scores[i];
+					topnames = hname[i];
 				}
+
 			}
 
 			for ( int i = 0; i < 5; i++)
@@ -432,22 +452,29 @@ void updateScore()
 				if (scores[i] == highest)
 				{
 					hscore[j] = scores[i];
+					namae[j] = hname[i];
 					scores[i] = 0;
+					hname[i] = "";
 					highest = 0;
+					topnames = "";
 					break;
 				}
 			}
 		}
 
 		Writein.open ("highscores.txt" ); 
+		Writeinto.open ("highscorename.txt" ); 
 
 		for (int i = 0; i < 5; i++)
 		{
 			Writein << hscore[i] << endl; 
+			Writeinto << namae[i] << endl;
 		}
 
 		Writein.close();
+		Writeinto.close();
 		Read.close();
+		Read2.close();
 
 	} 
 }

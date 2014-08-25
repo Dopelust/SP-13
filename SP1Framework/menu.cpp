@@ -57,6 +57,11 @@ void gameMenu(int x)
 	ifstream Read;
 	string words ; 
 	Read.open ("highscores.txt" ) ;
+
+	ifstream Read2;
+	string names ; 
+	Read2.open ("highscorename.txt" ) ;
+
 	system("cls") ; 
 	switch(x)
 	{
@@ -87,13 +92,15 @@ void gameMenu(int x)
 		break;
 		// HighScore
 	case 3: cout <<"                                 Top Highscores! "<< endl; 
-		if (Read.is_open()) 
+		if (Read.is_open() && Read2.is_open()) 
 		{ 
 			for ( int z = 0 ; z < 5 ; z++ ) 
 			{
 				colour(0x0F);
 				getline(Read,words);
-				cout <<"                                      "<< z+1  << "."<< words << endl ;
+				colour(0x0F);
+				getline(Read2,names);
+				cout <<"                          "<< z+1  << ".  "<< names << "     " << words << endl ;
 				colour(0x0A);
 			}
 
