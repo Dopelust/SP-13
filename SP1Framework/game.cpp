@@ -22,7 +22,7 @@ bool createUlti = 0;
 int ultiBar = 50;
 
 //Enemy
-int currentWave = 5;
+int currentWave = 1;
 COORD enemyLocation[20];
 
 //Boss

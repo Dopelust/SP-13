@@ -31,20 +31,21 @@ void menu()
 	int x;
 	cin >> x ;
 
-	if (x > 7 || x < 0)
+	if ( x < Exit && x > 0 ) 
 	{
-		menu();
-	}
+		gameMenu(x); 
+	} 
 
-	else if (x < 7 && x > 0 )
-	{
-		gameMenu(x);
-	}
+	else if ( x == Exit )  
+	{ 
+		cout << "Closing Application" << endl ; 
+		exit(1); 
+	} 
 
-	else
-	{
-		cout << "Closing Application" << endl;
-	}
+	else if ( x != Exit || x == 0  ) 
+	{ 
+		menu(); 
+	} 
 
 }
 
