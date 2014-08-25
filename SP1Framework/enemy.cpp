@@ -134,19 +134,22 @@ void collisions()
 	//ulti collisions
 	if (Pink.bossLocation.Y == ultiLocation.Y)
 	{
-		Pink.health -=100;
+		Pink.health -=10;
 	}
 
 	//missile collisions
-	for (int j = 0; j < 3; j++)
+	for (int j = 0; j < 2; j++)
 	{
 		//collision with Codename Pink	
 		if (( Pink.bossLocation.X <= missileRLocation[j].X) && (Pink.bossLocation.Y == missileRLocation[j].Y))
 		{
 			Pink.health -=5;
+		}
+		if (( Pink.bossLocation.X <= missileLLocation[j].X) && (Pink.bossLocation.Y == missileLLocation[j].Y))
+		{
+			Pink.health -=5;
 			break;
 		}
-
 		//collision with enemies
 		for ( int i = 0; i != currentWave; i++)
 		{

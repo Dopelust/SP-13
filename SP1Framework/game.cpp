@@ -31,7 +31,7 @@ Boss Pink;
 Boss Zebra;
 
 //PowerUps
-bool laserSight = 0;
+bool laserSight = 1;
 bool fourMissiles = 1;
 
 //Misc
@@ -95,9 +95,8 @@ void update(double dt)
 			heart++;
 		}
 		currentWave++;
-
 		enemyLocation[currentWave-1].X = consoleSize.X - 5;
-		enemyLocation[currentWave-1].Y = rand() % 20 + 3 ;
+		enemyLocation[currentWave-1].Y = rand() % 20 + 3 ;	
 	}
 
     // Updating the location of the character based on the key press
@@ -168,7 +167,6 @@ void render()
 		}
 	}
 
-
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
 }
@@ -178,27 +176,24 @@ void missile()
 	//calls missile creation when space is pressed
 	if (keyPressed[K_SPACE])
     {
-		if (createMissileR[0] == 0)
+		if (createMissileR[0] == 0 && createMissileL[1] == 0)
 		{
 			createMissileR[0] = 1;
 		}
 
-		else if (createMissileR[0] == 1)
+		else if (fourMissiles == true && createMissileR[1] == 0  && createMissileL[1] == 0)
+		{
+			createMissileR[1] = 1;
+		}
+
+		else if (createMissileR[0] == 1 && createMissileL[0] == 0 && createMissileL[1] == 0)
 		{
 			createMissileL[0] = 1;
 		}
 
-		else if (fourMissiles == 1)
-		{
-			if (createMissileL[0] == 1)
-			{
-				createMissileR[1] = 1;
-			}
-
-			else if (createMissileR[1] == 1)
-			{	
-				createMissileL[1] = 1;
-			}
+		else if (fourMissiles == true && createMissileL[1] == 0)
+		{	
+			createMissileL[1] = 1;
 		}
 	}
 
@@ -335,7 +330,7 @@ void renderUI()
 
 	gotoXY(0, 23);
 	colour(0x04);
-	for (int i = 0; i < Pink.health; i++)
+	for (int i = 0; i < Pink.health*2; i++)
 	{
 		std::cout << "|";
 	}
@@ -370,16 +365,21 @@ void renderPlayer()
 	std::cout << std::endl << "  /===========\\" << std::endl ;
 	std::cout << "  \\_@_@_@_@_@_/";
 
-	for (int i = 0; i < 2; i ++)
-	{
-		gotoXY(missileRLocation[i]);
-		colour(0x0C);  
-		std::cout << "--===>"; 
+	gotoXY(missileRLocation[1]);
+	colour(0x0E);  
+	std::cout << "--===>"; 
 
-		gotoXY(missileLLocation[i]);
-		colour(0x0C);
-		std::cout << "--===>";
-	}
+	gotoXY(missileLLocation[1]);
+	colour(0x0E);
+	std::cout << "--===>";
+
+	gotoXY(missileRLocation[0]);
+	colour(0x0C);  
+	std::cout << "--===>"; 
+
+	gotoXY(missileLLocation[0]);
+	colour(0x0C);
+	std::cout << "--===>";
 
 }
 
