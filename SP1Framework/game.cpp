@@ -39,6 +39,8 @@ bool fourMissiles = 1;
 //Misc
 COORD deathLocation;
 COORD nullLocation;
+bool pause = 0;
+COORD pointerLocation;
 
 void init()
 {
@@ -73,68 +75,73 @@ void getInput()
 {    
     keyPressed[K_UP] = isKeyPressed(VK_UP);
     keyPressed[K_DOWN] = isKeyPressed(VK_DOWN);
-    keyPressed[K_LEFT] = isKeyPressed(VK_LEFT);
-    keyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
     keyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
     keyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
+	keyPressed[K_X] = isKeyPressed(0x58);
 	keyPressed[K_Z] = isKeyPressed(0x5A);
 }
 
 void update(double dt)
 {
-    // get the delta time
-    elapsedTime += dt;
-    deltaTime = dt;
-
-	if (score >= (3*((currentWave*currentWave) + (3*currentWave))/2) && currentWave < 20)
+	if (!pause)
 	{
-		score--;
-		if ( heart < 10)
+		 // get the delta time
+		elapsedTime += dt;
+		deltaTime = dt;
+
+		if (score >= (3*((currentWave*currentWave) + (3*currentWave))/2) && currentWave < 20)
 		{
-			heart++;
+			score--;
+			if ( heart < 10)
+			{
+				heart++;
+			}
+			currentWave++;
 		}
-		currentWave++;
+
+	    // Updating the location of the character based on the key press
+		if (keyPressed[K_UP] && charLocation.Y > 0 && charLocation.Y != 2)
+		{
+			charLocation.Y--; 
+		}
+
+		if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 21)
+		{
+			 charLocation.Y++; 
+		}
+	
+		missile();
+		ulti();
+
+		createEnemy();
+		collisions();
 	}
 
-    // Updating the location of the character based on the key press
-    if (keyPressed[K_UP] && charLocation.Y > 0 && charLocation.Y != 2)
-    {
-        charLocation.Y--; 
-    }
-
-    if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 21)
-    {
-        charLocation.Y++; 
-    }
-
-	missile();
-	ulti();
-
-	createEnemy();
-	collisions();
-
-    // quits the game if player hits the escape key
-    if (keyPressed[K_ESCAPE])
+	if ((keyPressed[K_ESCAPE])  && (pause == false))
 	{
-		pause();
+		pause = true;
+		pointerLocation.X = consoleSize.X - 46; 
+		pointerLocation.Y = (consoleSize.Y / 2) - 2; 
+	}
+	
+	if (pause == true)
+	{
+		if (keyPressed[K_UP] && pointerLocation.Y != (consoleSize.Y / 2) - 2)
+		{
+			pointerLocation.Y-=2; 
+			Beep (3000,100);
+		}
+
+		if (keyPressed[K_DOWN] && pointerLocation.Y != (consoleSize.Y / 2) + 2)
+		{
+			pointerLocation.Y+=2; 
+			Beep (3000,100);
+		}
 	}
 
-	if ( heart < 0)
+	if ((keyPressed[K_X])  && (pause == true))
 	{
-	colour(0x0A);
-		system ("cls");
-		cout << ""<< endl;
-		cout << "   ______                             ___                        "<< endl; 
-		cout << " .' ___  |                          .'   `.                      "<< endl;
-        cout << "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  "<< endl;
-		cout <<" | |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] "<< endl;
-		cout << "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    "<< endl;
-		cout << " `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  "<< endl << endl;
-		cout << " Please enter your name : " ;
-		cin >> names;
-		system ("cls");
-		updateScore();
-		g_quitGame= true;
+		pause = false;
 	}
 
 }
@@ -159,27 +166,68 @@ void render()
 		if ( spawnenemy[i] == 1 ) 
 		{ 
 			gotoXY(enemyLocation[i]); 
-			colour(0x02); 
-			std::cout << "Enemy" ; 
+			colour(0x09); 
+			std::cout << char(234) ; 
 		}
 	}
 	
-	if (currentWave == 5)
+	if (Pink.createBoss == 1)
 	{
-		gotoXY(Pink.bossLocation); 
-		colour(0x0D); 
-		std::cout << "Pink"; 
+		gotoXY(Pink.bossLocation.X + 4,Pink.bossLocation.Y ); 
+		colour(0x0D);
+		std::cout << "//-A-\\\\";
+		gotoXY(Pink.bossLocation.X + 2,Pink.bossLocation.Y+1); 
+		std::cout << "_-=======-_ ";
+		gotoXY(Pink.bossLocation.X,Pink.bossLocation.Y+2); 
+		std::cout << "(=__\\\\   //__=)";
+		gotoXY(Pink.bossLocation.X + 5,Pink.bossLocation.Y+3); 
+		std::cout << "-----";
+	}
 
-		for (int i = 0; i < Pink.index + 1; i++)
+	for (int i = 0; i < Pink.index; i++)
+	{
+		if (Pink.createProj[i] == true)
 		{
 			gotoXY(Pink.bossProjectile[i]); 
 			colour(0x0E); 
 			std::cout << "-"; 
 		}
 	}
+	
 
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
+	
+	if (pause == true)
+	{
+		gotoXY(consoleSize.X - 60, consoleSize.Y / 2-6); 
+		colour(0x0A); 
+		std::cout << "===========================================" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-5); 
+		std::cout << "|               Game Paused               |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-4); 
+		std::cout << "===========================================" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-3); 
+		std::cout << "|                                         |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-2); 
+		std::cout << "|               Resume                    |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-1); 
+		std::cout << "|                                         |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)); 
+		std::cout << "|               Main Menu                 |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+1); 
+		std::cout << "|                                         |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+2); 
+		std::cout << "|               Exit                      |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+3); 
+		std::cout << "|                                         |" ;
+		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+4); 
+		std::cout << "===========================================" ;
+
+		gotoXY(pointerLocation);
+		colour(0x0F);
+		std::cout << char(5);
+	}
 }
 
 void missile()
@@ -215,7 +263,7 @@ void missile()
 		{
 			missileRLocation[i].X+=8; //shot speed
 
-			if (missileRLocation[i].X >= consoleSize.X - 5) //if over the screen
+			if (missileRLocation[i].X >= consoleSize.X - 3) //if over the screen
 			{
 				createMissileR[i] = 0;
 				missileRLocation[i].X = charLocation.X + 8;
@@ -228,7 +276,7 @@ void missile()
 		{
 			missileLLocation[i].X+=8; //shot speed
 
-			if (missileLLocation[i].X >= consoleSize.X - 5) //if over the screen
+			if (missileLLocation[i].X >= consoleSize.X - 3) //if over the screen
 			{
 				createMissileL[i] = 0;
 				missileLLocation[i].X = charLocation.X + 8;
@@ -283,6 +331,11 @@ void ulti()
 		{
 			createUlti = 0;
 		}
+	}
+
+	else 
+	{
+		ultiLocation = nullLocation;
 	}
 }
 
@@ -341,7 +394,7 @@ void renderUI()
 
 	gotoXY(0, 23);
 	colour(0x04);
-	for (int i = 0; i < Pink.health*2; i++)
+	for (int i = 0; i < Pink.health/4; i++)
 	{
 		std::cout << "|";
 	}

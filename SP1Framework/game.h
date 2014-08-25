@@ -28,11 +28,10 @@ enum Keys
 {
     K_UP,
     K_DOWN,
-    K_LEFT,
-    K_RIGHT,
     K_ESCAPE,
     K_COUNT,
 	K_SPACE,
+	K_X,
 	K_Z
 };
 
@@ -49,7 +48,6 @@ enum Option
 
 void menu();
 void gameMenu(int x);
-void pause();
 
 void init();                // initialize your variables, allocate memory, etc
 void getInput();            // get input from player
