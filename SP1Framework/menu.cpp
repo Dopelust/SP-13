@@ -49,8 +49,7 @@ void menu()
 	else if ( x != Exit || x == 0  ) 
 	{ 
 		menu(); 
-	} 
-
+	}
 }
 
 void gameMenu(int x)
@@ -74,8 +73,11 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			colour(0x0C);
+			system("cls") ; 
+			cout<<"                         ----Goodbye! see you soon!----"<<endl;
+			cout<<"                          ";
 			exit(1);
-			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
@@ -84,14 +86,15 @@ void gameMenu(int x)
 		}
 		break;
 		// HighScore
-	case 3: cout <<"                          Welcome to the Hall of Fame! "<< endl; 
+	case 3: cout <<"                                 Top Highscores! "<< endl; 
 		if (Read.is_open()) 
 		{ 
 			for ( int z = 0 ; z < 5 ; z++ ) 
 			{
 				colour(0x0F);
 				getline(Read,words);
-				cout << words << endl ; 
+				cout <<"                                      "<< z+1  << "."<< words << endl ;
+				colour(0x0A);
 			}
 
 		}
@@ -103,8 +106,11 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+			colour(0x0C);
+			system("cls") ; 
+			cout<<"                         ----Goodbye! see you soon!----"<<endl;
+			cout<<"                          ";
 			exit(1);
-			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
@@ -127,11 +133,15 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+		    colour(0x0C);
+			system("cls") ; 
+			cout<<"                         ----Goodbye! see you soon!----"<<endl;
+			cout<<"                          ";
 			exit(1);
-			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
+
 			exit(1);
 			cout <<" Error unknown input" <<endl;
 		}
@@ -145,8 +155,12 @@ void gameMenu(int x)
 		}
 		else if (P=='N' || P=='n')
 		{
+
+		    colour(0x0C);
+			system("cls") ; 
+			cout<<"                         ----Goodbye! see you soon!----"<<endl;
+			cout<<"                          ";
 			exit(1);
-			cout<<"Goodbye! see you soon!      ";
 		}
 		else 
 		{
