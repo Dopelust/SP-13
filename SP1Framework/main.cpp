@@ -9,10 +9,9 @@ using std::cin;
 
 StopWatch g_timer;            // Timer function to keep track of time and the frame rate
 bool g_quitGame = false;      // Set to true if you want to quit the game
-const unsigned char FPS = 10; // FPS of this game
+const unsigned char FPS = 15; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 
-bool g_playGame = 1;
 extern int heart;
 extern string names;
 void mainLoop();
@@ -22,11 +21,6 @@ void mainLoop();
 
 int main()
 {
-	while (!g_playGame)
-	{
-		menu();
-	}
-
 	init();      // initialize your variables
 	mainLoop();  // main loop
 	shutdown();  // do clean up, if any. free memory.
@@ -49,18 +43,8 @@ void mainLoop()
 
 		if ( heart <= 0)
 		{
-			colour(0x0A);
-			system ("cls");
-			cout << ""<< endl;
-			cout << "   ______                             ___                        "<< endl; 
-			cout << " .' ___  |                          .'   `.                      "<< endl;
-			cout << "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  "<< endl;
-			cout <<" | |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] "<< endl;
-			cout << "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    "<< endl;
-			cout << " `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  "<< endl << endl;
-			cout << " Please enter your name : " ;
+			gameOver();
 			cin >> names;
-			system ("cls");
 			updateScore();
 			g_quitGame= true;
 		}

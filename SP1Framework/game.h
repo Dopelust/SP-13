@@ -21,6 +21,7 @@ struct Boss
 	int index;
 	bool moveUp;
 	bool moveDown;
+	bool shield;
 	int health;
 };
 
@@ -34,20 +35,6 @@ enum Keys
 	K_X,
 	K_Z
 };
-
-enum Option
-{
-	blank,
-	Start,
-	Options,
-	Rules,
-	HighScore,
-	Credits,
-	Exit,
-};
-
-void menu();
-void gameMenu(int x);
 
 void init();                // initialize your variables, allocate memory, etc
 void getInput();            // get input from player
@@ -65,5 +52,57 @@ void updateScore();
 //render
 void renderUI();
 void renderPlayer();
+void renderBack();
+void renderMenu();
+void gameOver();
+void renderWave();
+void renderWaveAlt();
+
+void tutorial();
+void Pink5();
+
+//Requisite
+extern double elapsedTime;
+extern double deltaTime;
+//Player
+extern int heart;
+extern int score ;
+extern COORD charLocation;
+extern COORD missileRLocation[2];
+extern bool createMissileR[2];
+extern COORD missileLLocation[2];
+extern bool createMissileL[2];
+extern COORD ultiLocation;
+extern bool createUlti;
+extern int ultiBar;
+//Enemy
+extern int currentWave;
+extern bool spawnenemy[20]; 
+extern COORD enemyLocation[20];
+//Tutorial
+extern bool promptCondition[5];
+extern bool prompt[6];
+extern bool spawndummy;
+extern COORD dummyLocation; 
+//Boss
+extern Boss Pink;
+extern Boss Mothership;
+//PowerUps
+extern bool laserSight;
+extern bool fourMissiles;
+//Misc
+extern COORD deathLocation;
+extern COORD nullLocation;
+extern COORD pointerLocation;
+extern bool pause;
+extern bool menu;
+extern int delay;
+extern int waveDelay;
+extern int frame;
+//Background
+extern void comet(); 
+extern int comets;
+extern COORD cometLocation[30]; 
+extern bool spawnComet[30];
 
 #endif // _GAME_H

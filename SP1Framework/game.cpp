@@ -3,66 +3,81 @@
 #include <iostream>
 #include <iomanip>
 
+bool keyPressed[K_COUNT];
+
 //Requisite
-COORD consoleSize;
+COORD ConsoleSize = {80,25};
 double elapsedTime;
 double deltaTime;
-bool keyPressed[K_COUNT];
-extern void Inmenu();
-
-//Player
-string names;
-int heart = 5;
-int score = 45; 
-COORD charLocation;
-COORD missileRLocation[2];
-bool createMissileR[2] = {0,0};
-COORD missileLLocation[2];
-bool createMissileL[2] = {0,0};
-COORD ultiLocation;
-bool createUlti = 0;
-int ultiBar = 50;
-
-//Enemy
-int currentWave = 5;
-bool spawnenemy[20] ; 
-COORD enemyLocation[20];
-
 //Boss
 Boss Pink;
-Boss Zebra;
-
+Boss Mothership;
+//Player
+string names;
+int heart = 15;
+int score = 0; 
+bool createMissileR[2] = {0,0};
+bool createMissileL[2] = {0,0};
+bool createUlti = 0;
+int ultiBar = 50;
+COORD charLocation;
+COORD missileRLocation[2];
+COORD missileLLocation[2];
+COORD ultiLocation;
+//Enemy
+int currentWave = 0;
+bool spawnenemy[20]; 
+COORD enemyLocation[20];
+//Tutorial
+bool spawndummy = 0 ;
+bool promptCondition[5];
+bool prompt[6];
+COORD dummyLocation; 
 //PowerUps
 bool laserSight = 1;
 bool fourMissiles = 0;
-
 //Misc
+bool pause = 0;
+bool menu = 1;
+int comets = 1; 
+int delay = 0;
+int waveDelay = 0;
+int frame = 0;
 COORD deathLocation;
 COORD nullLocation;
-bool pause = 0;
 COORD pointerLocation;
+//Background
+void comet(); 
+COORD cometLocation[30]; 
+bool spawnComet[30];
 
 void init()
 {
-    // Set precision for floating point output
-    std::cout << std::fixed << std::setprecision(3);
-
-    // Get console width and height
-    CONSOLE_SCREEN_BUFFER_INFO csbi; /* to get buffer info */     
-
-    /* get the number of character cells in the current buffer */ 
-    GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &csbi );
-    consoleSize.X = csbi.srWindow.Right + 1;
-    consoleSize.Y = csbi.srWindow.Bottom + 1;
-
-    // set the character to be in the center of the screen.
-    charLocation.X = 0;
-    charLocation.Y = consoleSize.Y / 2;  
-
-	nullLocation.X = '\0' ; 
-	nullLocation.Y = '\0' ; 
-
+    //time
     elapsedTime = 0.0;
+
+	//console
+	initConsole(ConsoleSize, "SP1 Framework");
+
+	//menu pointer
+	pointerLocation.X = 6; 
+	pointerLocation.Y = 10; 
+
+    //character
+    charLocation.X = 0;
+    charLocation.Y = (ConsoleSize.Y / 2) - 2;  
+
+	//tutorial dummy
+	dummyLocation.X = ConsoleSize.X - 5;
+	dummyLocation.Y = ( ConsoleSize.Y / 2 ) + 3;
+
+	//background
+	for ( int i = 0 ; i < 30 ; i++ ) 
+	{ 
+		spawnComet[i] = 1 ; 
+		cometLocation[i].X = rand() % 80 + 1; //new spawn location
+		cometLocation[i].Y = rand() % 20 + 4 ;
+	}
 }
 
 void shutdown()
@@ -83,31 +98,46 @@ void getInput()
 
 void update(double dt)
 {
-	if (!pause)
+	if (!pause && !menu)
 	{
 		 // get the delta time
 		elapsedTime += dt;
 		deltaTime = dt;
 
-		if (score >= (3*((currentWave*currentWave) + (3*currentWave))/2) && currentWave < 20)
+		comet();
+
+		if (currentWave != 0)
 		{
-			score--;
-			if ( heart < 10)
+			if (score >= (3*((currentWave*currentWave) + (3*currentWave))/2) && currentWave < 20)
 			{
-				heart++;
+				if ( heart < 10)
+				{
+					heart++;
+				}	
+
+				currentWave++;
+				waveDelay = 0;
 			}
-			currentWave++;
+		}
+
+		if (keyPressed[K_ESCAPE])
+		{
+			pause = true;
+			pointerLocation.X = ConsoleSize.X - 45; 
+			pointerLocation.Y = (ConsoleSize.Y / 2) - 2; 
 		}
 
 	    // Updating the location of the character based on the key press
 		if (keyPressed[K_UP] && charLocation.Y > 0 && charLocation.Y != 2)
 		{
 			charLocation.Y--; 
+			promptCondition[0] = true;
 		}
 
-		if (keyPressed[K_DOWN] && charLocation.Y < consoleSize.Y - 1 && charLocation.Y != 21)
+		if (keyPressed[K_DOWN] && charLocation.Y < ConsoleSize.Y - 1 && charLocation.Y != 21)
 		{
-			 charLocation.Y++; 
+			 charLocation.Y++;
+			 promptCondition[0] = true;
 		}
 	
 		missile();
@@ -115,119 +145,207 @@ void update(double dt)
 
 		createEnemy();
 		collisions();
+
+		Pink5();
+		
 	}
 
-	if ((keyPressed[K_ESCAPE])  && (pause == false))
+	else if (menu == true)
 	{
-		pause = true;
-		pointerLocation.X = consoleSize.X - 46; 
-		pointerLocation.Y = (consoleSize.Y / 2) - 2; 
-	}
-	
-	if (pause == true)
-	{
-		if (keyPressed[K_UP] && pointerLocation.Y != (consoleSize.Y / 2) - 2)
+		if (keyPressed[K_UP] && pointerLocation.Y != 10)
 		{
 			pointerLocation.Y-=2; 
 			Beep (3000,100);
 		}
 
-		if (keyPressed[K_DOWN] && pointerLocation.Y != (consoleSize.Y / 2) + 2)
+		if (keyPressed[K_DOWN] && pointerLocation.Y != 18)
 		{
 			pointerLocation.Y+=2; 
 			Beep (3000,100);
 		}
+
+		if (keyPressed[K_X])
+		{
+			if (pointerLocation.Y == 10) //Play
+			{
+				menu = false;
+			}
+			else if (pointerLocation.Y == 12) //Instructions
+			{
+				
+			}	
+			else if (pointerLocation.Y == 14) //Leaderboard
+			{
+			
+			}
+			else if (pointerLocation.Y == 16) //Credits
+			{
+				
+			}
+			else if (pointerLocation.Y == 18) //Exit
+			{
+
+			}
+		}
+	}
+	
+	if (pause == true)
+	{
+		if (keyPressed[K_UP] && pointerLocation.Y != (ConsoleSize.Y / 2) - 2)
+		{
+			pointerLocation.Y-=2; 
+			Beep (3000,100);
+		}
+
+		if (keyPressed[K_DOWN] && pointerLocation.Y != (ConsoleSize.Y / 2) + 2)
+		{
+			pointerLocation.Y+=2; 
+			Beep (3000,100);
+		}
+
+		if (keyPressed[K_X])
+		{
+			if(pointerLocation.Y == (ConsoleSize.Y/2)-2)
+			{
+				pause = false;
+			}
+			else if (pointerLocation.Y == (ConsoleSize.Y/2))
+			{
+				pause = false;
+				menu = true;
+				pointerLocation.X = 6; 
+				pointerLocation.Y = 10; 
+			}	
+			else if(pointerLocation.Y == (ConsoleSize.Y/2)+2)
+			{
+				g_quitGame = true;
+			}
+		}
 	}
 
-	if ((keyPressed[K_X])  && (pause == true))
-	{
-		pause = false;
-	}
+	
 
 }
 
 void render()
 {
     // clear previous screen
-    colour(0x0F);
-    cls();
+    clearBuffer(0x0F);
 
-	gotoXY(deathLocation); 
-	colour(0x7C); 
-	std::cout << "BOOM"; 
-	deathLocation = nullLocation; 
+	COORD c;
 	
+	if (menu == true)
+	{
+		renderMenu();
+	}
+
+	else
+	{
+
+	renderBack();	
+
 	//player render
     renderPlayer();
+
+	if (spawndummy == true)
+	{
+		writeToBuffer (dummyLocation, "Û±°", 0x09);
+	}
+
+	if ( currentWave == 0 ) 
+	{ 
+		c.X = 3;
+		c.Y = ConsoleSize.Y - 3 ;
+
+		if ( prompt[0] == true ) 
+		{
+			writeToBuffer ( c , "Press UP/DOWN to move" , 0x0A ) ; 
+		}
+
+		if ( prompt[1] == true ) 
+		{
+			writeToBuffer( c, "Good job! Now press SPACE to shoot!" , 0x0A) ; 
+		} 
+
+		if ( prompt[2] == true ) 
+		{ 
+			writeToBuffer( c, "Oh no, an enemy appears! Hurry, shoot it down before it reaches your base!" , 0x0A) ; 
+		} 
+
+		if ( prompt[3] == true ) 
+		{ 
+			writeToBuffer(c, "Oh no! Try again!" , 0x0A) ; 
+		} 
+
+	} 
+
+	c.X = 3;
+	c.Y = ConsoleSize.Y - 3 ;
+
+	if ( prompt[4] == true ) 
+	{ 
+		writeToBuffer(c, "Good job! Wave 1 begins!" , 0x0A) ; 
+	} 
 
 	//enemy render
 	for ( int i = 0; i != currentWave; i++)
 	{
 		if ( spawnenemy[i] == 1 ) 
 		{ 
-			gotoXY(enemyLocation[i]); 
-			colour(0x09); 
-			std::cout << char(234) ; 
+			if (i%2 == 0 & currentWave > 5)
+			{
+				writeToBuffer (enemyLocation[i], "Û±°", 0x0C);
+			}
+
+			else
+			{
+				writeToBuffer (enemyLocation[i], "Û±°", 0x09);
+			}
 		}
 	}
-	
-	if (Pink.createBoss == 1)
+
+	if ((Pink.createBoss == 1 || frame <= 70) && currentWave == 5)
 	{
-		gotoXY(Pink.bossLocation.X + 4,Pink.bossLocation.Y ); 
-		colour(0x0D);
-		std::cout << "//-A-\\\\";
-		gotoXY(Pink.bossLocation.X + 2,Pink.bossLocation.Y+1); 
-		std::cout << "_-=======-_ ";
-		gotoXY(Pink.bossLocation.X,Pink.bossLocation.Y+2); 
-		std::cout << "(=__\\\\   //__=)";
-		gotoXY(Pink.bossLocation.X + 5,Pink.bossLocation.Y+3); 
-		std::cout << "-----";
+		c.X = Pink.bossLocation.X + 4;
+		c.Y = Pink.bossLocation.Y;
+		writeToBuffer (c , "//-A-\\\\", 0x0D); c.Y++;
+		c.X = Pink.bossLocation.X + 2;
+		writeToBuffer (c , "_-=======-_ ", 0x0D); c.Y++;
+		c.X = Pink.bossLocation.X ;
+		writeToBuffer (c , "(=__\\\\   //__=)", 0x0D); c.Y++;
+		c.X = Pink.bossLocation.X + 5;
+		writeToBuffer (c , "-----", 0x0D);
+
+		if (Pink.shield == true)
+		{
+			c.X = ConsoleSize.X - 18;
+			c.Y = Pink.bossLocation.Y - 1;
+			writeToBuffer (c , " /", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , " \\", 0x0D);
+		}
 	}
+
+	writeToBuffer (deathLocation, "BOOM", 0x7C);
+	deathLocation = nullLocation;
 
 	for (int i = 0; i < Pink.index; i++)
 	{
 		if (Pink.createProj[i] == true)
 		{
-			gotoXY(Pink.bossProjectile[i]); 
-			colour(0x0E); 
-			std::cout << "-"; 
+			writeToBuffer (Pink.bossProjectile[i] , "-", 0x0E);
 		}
 	}
 	
-
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
-	
-	if (pause == true)
-	{
-		gotoXY(consoleSize.X - 60, consoleSize.Y / 2-6); 
-		colour(0x0A); 
-		std::cout << "===========================================" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-5); 
-		std::cout << "|               Game Paused               |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-4); 
-		std::cout << "===========================================" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-3); 
-		std::cout << "|                                         |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-2); 
-		std::cout << "|               Resume                    |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)-1); 
-		std::cout << "|                                         |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)); 
-		std::cout << "|               Main Menu                 |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+1); 
-		std::cout << "|                                         |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+2); 
-		std::cout << "|               Exit                      |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+3); 
-		std::cout << "|                                         |" ;
-		gotoXY(consoleSize.X - 60, (consoleSize.Y / 2)+4); 
-		std::cout << "===========================================" ;
 
-		gotoXY(pointerLocation);
-		colour(0x0F);
-		std::cout << char(5);
 	}
+
+	flushBufferToConsole();
 }
 
 void missile()
@@ -235,6 +353,8 @@ void missile()
 	//calls missile creation when space is pressed
 	if (keyPressed[K_SPACE])
     {
+		promptCondition[1] = true;
+
 		if (createMissileR[0] == 0 && createMissileL[1] == 0)
 		{
 			createMissileR[0] = 1;
@@ -263,7 +383,7 @@ void missile()
 		{
 			missileRLocation[i].X+=8; //shot speed
 
-			if (missileRLocation[i].X >= consoleSize.X - 3) //if over the screen
+			if (missileRLocation[i].X >= ConsoleSize.X - 3) //if over the screen
 			{
 				createMissileR[i] = 0;
 				missileRLocation[i].X = charLocation.X + 8;
@@ -276,16 +396,14 @@ void missile()
 		{
 			missileLLocation[i].X+=8; //shot speed
 
-			if (missileLLocation[i].X >= consoleSize.X - 3) //if over the screen
+			if (missileLLocation[i].X >= ConsoleSize.X - 3) //if over the screen
 			{
 				createMissileL[i] = 0;
-				missileLLocation[i].X = charLocation.X + 8;
+				missileLLocation[i].X = charLocation.X + 2;
 				missileLLocation[i].Y = charLocation.Y + 1; //ready for fire again
 			}
 		}
-
 	}
-		
 	if (createMissileL[0] == 0)
 	{
 		missileLLocation[0].X = charLocation.X + 2;
@@ -323,7 +441,7 @@ void ulti()
 
 	if (createUlti == 1)
 	{
-		ultiLocation.X = consoleSize.X;
+		ultiLocation.X = ConsoleSize.X;
 		ultiLocation.Y = charLocation.Y + 1;
 		ultiBar--;
 
@@ -337,114 +455,6 @@ void ulti()
 	{
 		ultiLocation = nullLocation;
 	}
-}
-
-void renderUI()
-{
-	gotoXY(0, 0);
-    colour(0x0F);
-    std::cout << "Time: " << elapsedTime << std::endl;
-
-	gotoXY(15,0);
-	colour(0x0F);
-	std::cout << "Wave " << currentWave;
-
-	gotoXY(25,0); 
-	colour(0x0C); 
-	for (int i = 0; i < heart; i++)
-	{
-		std::cout << char(3) << " ";
-	}
-
-	gotoXY(25, 1);
-	colour(0x0B);
-	for (int i = 0; i < ultiBar/10; i++)
-	{
-		std::cout << char(4) << " ";
-	}
-	colour(0x01);
-	for (int i = 0; i < 5 - (ultiBar/10); i++)
-	{
-		std::cout << char(4) << " ";
-	}
-
-	gotoXY(38,1); 
-	colour(0x0F);
-	if (currentWave == 2)
-	{
-		std::cout << "Wave 1 Complete! Laser Sight Installed.";
-		laserSight = true;
-	}
-	if (currentWave == 6)
-	{
-		std::cout << "Wave 5 Complete! ";
-	}
-	if (currentWave == 11)
-	{
-		std::cout << "Wave 10 Complete! ";
-	}
-
-	gotoXY(50,0); 
-	colour(0x0F);
-	std::cout << "Score: " << score;
-
-	gotoXY(70, 0);
-    colour(0x0F);
-    std::cout << 1.0 / deltaTime << "fps";
-
-	gotoXY(0, 23);
-	colour(0x04);
-	for (int i = 0; i < Pink.health/4; i++)
-	{
-		std::cout << "|";
-	}
-}
-
-void renderPlayer()
-{
-
-	gotoXY(charLocation);
-    colour(0x07);
-    std::cout << "  /---\\_________" << std::endl;
-	std::cout << " |____________|_|";
-	if (createUlti == true)
-	{
-		gotoXY(ultiLocation);
-		colour(0x0B);
-		for ( int i = 18; i < ultiLocation.X; i++)
-		{
-			std::cout << "=";
-		}
-		colour(0x07);
-	}
-	else if (laserSight == true)
-	{
-		colour(0x04);
-		for ( int i = 18; i < consoleSize.X; i++)
-		{
-			std::cout << "-";
-		}
-		colour(0x07);
-	}
-	std::cout << std::endl << "  /===========\\" << std::endl ;
-	std::cout << "  \\_@_@_@_@_@_/";
-
-	gotoXY(missileRLocation[1]);
-	colour(0x0E);  
-	std::cout << "--===>"; 
-
-	gotoXY(missileLLocation[1]);
-	colour(0x0E);
-	std::cout << "--===>";
-
-	gotoXY(missileRLocation[0]);
-	colour(0x0C);  
-	std::cout << "--===>"; 
-
-	gotoXY(missileLLocation[0]);
-	colour(0x0C);
-	std::cout << "--===>";
-
 }
 
 //highscore
@@ -545,3 +555,59 @@ void updateScore()
 
 	} 
 }
+
+void gameOver()
+{
+	clearBuffer(0x0F);
+
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	writeToBuffer(c, "   ______                             ___                        ", 0x0A); c.Y++;
+	writeToBuffer(c, " .' ___  |                          .'   `.                      ", 0x0A); c.Y++;
+	writeToBuffer(c, "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  ", 0x0A); c.Y++;
+	writeToBuffer(c, "| |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] ", 0x0A); c.Y++;
+	writeToBuffer(c, "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    ", 0x0A); c.Y++;
+	writeToBuffer(c,"  `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  ", 0x0A); c.Y++;
+	writeToBuffer(c, " Please enter your name : ", 0x0A); 
+
+	flushBufferToConsole();
+			
+}
+
+void comet() 
+{ 
+	if (delay == 1)
+	{
+		delay = 0;
+	}
+
+	else if (delay == 0)
+	{
+		for ( int i = 0 ; i < 30 ; i++ ) 
+		{ 
+			comets = rand() % 100 + 1;
+
+			if ( comets == 1 && spawnComet[i] == 0 ) 
+			{ 
+				spawnComet[i] = 1 ; 
+				cometLocation[i].X = ConsoleSize.X - 1; //new spawn location
+				cometLocation[i].Y = rand() % 25 ;
+			} 
+
+			if ( spawnComet[i] == 1 ) 
+			{ 
+				cometLocation[i].X--;
+			} 
+
+			if ( cometLocation[i].X < 1 ) 
+			{ 
+				cometLocation[i].X = ConsoleSize.X - 1; //new spawn location
+				cometLocation[i].Y = rand() % 25 ;
+			}
+		}
+
+		delay++;
+	}
+	
+} 
