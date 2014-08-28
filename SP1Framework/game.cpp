@@ -11,38 +11,37 @@ double elapsedTime;
 double deltaTime;
 //Boss
 Boss Pink;
-Boss Mothership;
+Boss Mothership[3];
 //Player
 string names;
 int heart = 15;
 int score = 0; 
-bool createMissileR[2] = {0,0};
-bool createMissileL[2] = {0,0};
+bool createMissile[4];
+COORD missileLocation[4];
 bool createUlti = 0;
 int ultiBar = 50;
 COORD charLocation;
-COORD missileRLocation[2];
-COORD missileLLocation[2];
 COORD ultiLocation;
 //Enemy
-int currentWave = 0;
+int currentWave = 10;
 bool spawnenemy[20]; 
 COORD enemyLocation[20];
 //Tutorial
-bool spawndummy = 0 ;
-bool promptCondition[5];
 bool prompt[6];
+bool promptCondition[5];
+bool spawndummy = 0 ;
 COORD dummyLocation; 
 //PowerUps
 bool laserSight = 1;
-bool fourMissiles = 0;
+bool fourMissiles = 1;
 //Misc
 bool pause = 0;
 bool menu = 1;
 int comets = 1; 
-int delay = 0;
-int waveDelay = 0;
-int frame = 0;
+bool delay = 0; //for blue asteroids and stars
+int waveDelay = 0; //blinks the Wave
+int deathFrame = 0; //boss death animation
+int spawnFrame = 0; //boss spawn animation
 COORD deathLocation;
 COORD nullLocation;
 COORD pointerLocation;
@@ -146,8 +145,15 @@ void update(double dt)
 		createEnemy();
 		collisions();
 
-		Pink5();
-		
+		if (currentWave == 5)
+		{
+			Pink5();
+		}
+
+		if (currentWave == 10)
+		{
+			Mothership10();
+		}
 	}
 
 	else if (menu == true)
@@ -304,41 +310,76 @@ void render()
 		}
 	}
 
-	if ((Pink.createBoss == 1 || frame <= 70) && currentWave == 5)
-	{
-		c.X = Pink.bossLocation.X + 4;
-		c.Y = Pink.bossLocation.Y;
-		writeToBuffer (c , "//-A-\\\\", 0x0D); c.Y++;
-		c.X = Pink.bossLocation.X + 2;
-		writeToBuffer (c , "_-=======-_ ", 0x0D); c.Y++;
-		c.X = Pink.bossLocation.X ;
-		writeToBuffer (c , "(=__\\\\   //__=)", 0x0D); c.Y++;
-		c.X = Pink.bossLocation.X + 5;
-		writeToBuffer (c , "-----", 0x0D);
+	renderPink();
 
-		if (Pink.shield == true)
+	for ( int m = 0; m < 3; m++)
+	{
+		if (Mothership[m].createBoss == true)
 		{
-			c.X = ConsoleSize.X - 18;
-			c.Y = Pink.bossLocation.Y - 1;
-			writeToBuffer (c , " /", 0x0D); c.Y++;
-			writeToBuffer (c , "|", 0x0D); c.Y++;
-			writeToBuffer (c , "|", 0x0D); c.Y++;
-			writeToBuffer (c , "|", 0x0D); c.Y++;
-			writeToBuffer (c , "|", 0x0D); c.Y++;
-			writeToBuffer (c , " \\", 0x0D);
+			if (Mothership[m].health > 400)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=ÛÛ", 0x0F); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-°-||", 0x0F); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x0F); c.Y++;
+				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0F); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x0F); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-°-||", 0x0F); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=ÛÛ", 0x0F); c.Y++;
+			}
+
+			else if (Mothership[m].health > 300)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=ÛÛ", 0x07); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-°-||", 0x07); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x07); c.Y++;
+				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x07); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x07); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-°-||", 0x07); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=ÛÛ", 0x07); c.Y++;
+			}
+
+			else if (Mothership[m].health > 200)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=ÛÛ", 0x08); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-°-||", 0x08); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x08); c.Y++;
+				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x08); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x08); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-°-||", 0x08); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=ÛÛ", 0x08); c.Y++;
+			}
+
+			else if (Mothership[m].health > 100)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=ÛÛ", 0x04); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-°-||", 0x04); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x04); c.Y++;
+				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x04); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x04); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-°-||", 0x04); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=ÛÛ", 0x04); c.Y++;
+			}
+
+			else if (Mothership[m].health > 0)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=ÛÛ", 0x0C); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-°-||", 0x0C); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x0C); c.Y++;
+				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0C); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-°-||", 0x0C); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=ÛÛ", 0x0C); c.Y++;
+			}
 		}
 	}
 
 	writeToBuffer (deathLocation, "BOOM", 0x7C);
 	deathLocation = nullLocation;
-
-	for (int i = 0; i < Pink.index; i++)
-	{
-		if (Pink.createProj[i] == true)
-		{
-			writeToBuffer (Pink.bossProjectile[i] , "-", 0x0E);
-		}
-	}
 	
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
@@ -355,79 +396,54 @@ void missile()
     {
 		promptCondition[1] = true;
 
-		if (createMissileR[0] == 0 && createMissileL[1] == 0)
+		if (createMissile[0] == 0 && createMissile[3] == 0)
 		{
-			createMissileR[0] = 1;
+			createMissile[0] = 1;
 		}
 
-		else if (fourMissiles == true && createMissileR[1] == 0  && createMissileL[1] == 0)
+		else if (fourMissiles == true && createMissile[2] == 0  && createMissile[3] == 0)
 		{
-			createMissileR[1] = 1;
+			createMissile[2] = 1;
 		}
 
-		else if (createMissileR[0] == 1 && createMissileL[0] == 0 && createMissileL[1] == 0)
+		else if (createMissile[0] == 1 && createMissile[1] == 0 && createMissile[3] == 0)
 		{
-			createMissileL[0] = 1;
+			createMissile[1] = 1;
 		}
 
-		else if (fourMissiles == true && createMissileL[1] == 0)
+		else if (fourMissiles == true && createMissile[3] == 0)
 		{	
-			createMissileL[1] = 1;
+			createMissile[3] = 1;
 		}
 	}
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		//if create called
-		if (createMissileR[i] == 1)
+		if (fourMissiles == false && i == 2)
 		{
-			missileRLocation[i].X+=8; //shot speed
+			break;
+		}
 
-			if (missileRLocation[i].X >= ConsoleSize.X - 3) //if over the screen
+		if (createMissile[i] == 1)
+		{
+			missileLocation[i].X+=8; //shot speed
+
+			if (missileLocation[i].X >= ConsoleSize.X - 3) //if over the screen
 			{
-				createMissileR[i] = 0;
-				missileRLocation[i].X = charLocation.X + 8;
-				missileRLocation[i].Y = charLocation.Y + 1; //ready for fire again
+				createMissile[i] = 0;
 			}
 		}
 
-		//if create called
-		if (createMissileL[i] == 1)
+		if (i%2 == 0 && createMissile[i] == 0) //Left Missile
 		{
-			missileLLocation[i].X+=8; //shot speed
-
-			if (missileLLocation[i].X >= ConsoleSize.X - 3) //if over the screen
-			{
-				createMissileL[i] = 0;
-				missileLLocation[i].X = charLocation.X + 2;
-				missileLLocation[i].Y = charLocation.Y + 1; //ready for fire again
-			}
-		}
-	}
-	if (createMissileL[0] == 0)
-	{
-		missileLLocation[0].X = charLocation.X + 2;
-		missileLLocation[0].Y = charLocation.Y + 1; //follow the player
-	}
-	
-	if (createMissileR[0] == 0)
-	{
-		missileRLocation[0].X = charLocation.X + 8;
-		missileRLocation[0].Y = charLocation.Y + 1; //follow the player
-	}
-
-	if (fourMissiles == true)
-	{
-		if (createMissileL[1] == 0)
-		{
-			missileLLocation[1].X = charLocation.X + 2;
-			missileLLocation[1].Y = charLocation.Y + 1; //follow the player
+			missileLocation[i].X = charLocation.X + 8;
+			missileLocation[i].Y = charLocation.Y + 1; //follow the player
 		}
 	
-		if (createMissileR[1] == 0)
+		else if (createMissile[i] == 0) //Right Missile
 		{
-			missileRLocation[1].X = charLocation.X + 8;
-			missileRLocation[1].Y = charLocation.Y + 1; //follow the player
+			missileLocation[i].X = charLocation.X + 2;
+			missileLocation[i].Y = charLocation.Y + 1; //follow the player
 		}
 	}
 }

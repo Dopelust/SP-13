@@ -15,9 +15,9 @@ extern bool g_quitGame;
 struct Boss
 {
 	COORD bossLocation;
-	COORD bossProjectile[12];
+	COORD bossProjectile[24];
 	bool createBoss;
-	bool createProj[12];
+	bool createProj[24];
 	int index;
 	bool moveUp;
 	bool moveDown;
@@ -57,9 +57,11 @@ void renderMenu();
 void gameOver();
 void renderWave();
 void renderWaveAlt();
+void renderPink();
 
 void tutorial();
 void Pink5();
+void Mothership10();
 
 //Requisite
 extern double elapsedTime;
@@ -68,10 +70,8 @@ extern double deltaTime;
 extern int heart;
 extern int score ;
 extern COORD charLocation;
-extern COORD missileRLocation[2];
-extern bool createMissileR[2];
-extern COORD missileLLocation[2];
-extern bool createMissileL[2];
+extern COORD missileLocation[4];
+extern bool createMissile[4];
 extern COORD ultiLocation;
 extern bool createUlti;
 extern int ultiBar;
@@ -86,7 +86,7 @@ extern bool spawndummy;
 extern COORD dummyLocation; 
 //Boss
 extern Boss Pink;
-extern Boss Mothership;
+extern Boss Mothership[3];
 //PowerUps
 extern bool laserSight;
 extern bool fourMissiles;
@@ -96,9 +96,10 @@ extern COORD nullLocation;
 extern COORD pointerLocation;
 extern bool pause;
 extern bool menu;
-extern int delay;
+extern bool delay;
 extern int waveDelay;
-extern int frame;
+extern int deathFrame;
+extern int spawnFrame;
 //Background
 extern void comet(); 
 extern int comets;

@@ -79,31 +79,22 @@ void tutorial()
 		} 
 	}
 
-	for (int j = 0; j < 2; j++)
+	for (int j = 0; j < 4; j++)
 	{
+		if (fourMissiles == false && j == 2)
+		{
+			break;
+		}
 
-		if ( (dummyLocation.X <= missileRLocation[j].X && dummyLocation.Y == missileRLocation[j].Y) ) //if collide
+		if ( (dummyLocation.X <= missileLocation[j].X && dummyLocation.Y == missileLocation[j].Y) ) //if collide
 		{ 
 			deathLocation = dummyLocation;
 			promptCondition[2] = true;
 			promptCondition[3] = true;
 			spawndummy = 0;
 
-			createMissileR[j] = 0; //reset missile position
-			missileRLocation[j].X = charLocation.X + 10 ;
-			missileRLocation[j].Y = charLocation.Y + 1 ;
-		}
+			createMissile[j] = 0; //reset missile position
 
-		if (dummyLocation.X <= missileLLocation[j].X && dummyLocation.Y == missileLLocation[j].Y)
-		{
-			deathLocation = dummyLocation;
-			promptCondition[2] = true;
-			promptCondition[3] = true;
-			spawndummy = 0;
-
-			createMissileL[j] = 0;
-			missileLLocation[j].X = charLocation.X;
-			missileLLocation[j].Y = charLocation.Y + 1;
 		}
 
 	}
@@ -169,40 +160,27 @@ void collisions()
 	for ( int i = 0; i != currentWave; i++)
 	{
 		//With Missiles
-		for (int j = 0; j < 2; j++)
+		for (int j = 0; j < 4; j++)
 		{
+			if (fourMissiles == false && j == 2)
+			{
+				break;
+			}
+
 		
-		if ( (enemyLocation[i].X <= missileRLocation[j].X && enemyLocation[i].Y == missileRLocation[j].Y) ) //if collide
+		if ( (enemyLocation[i].X <= missileLocation[j].X && enemyLocation[i].Y == missileLocation[j].Y) ) //if collide
 		{ 
 			spawnenemy[i] = 0 ; 
 			deathLocation = enemyLocation[i]; //death animation
 			score ++; //score increase
 
-			createMissileR[j] = 0; //reset missile position
-			missileRLocation[j].X = charLocation.X + 10 ;
-			missileRLocation[j].Y = charLocation.Y + 1 ;
+			createMissile[j] = 0; //reset missile position
 
 			if (ultiBar < 50)
 			{
 				ultiBar +=2; //charge up laser
 			}
 		} 
-
-		if (enemyLocation[i].X <= missileLLocation[j].X && enemyLocation[i].Y == missileLLocation[j].Y)
-		{
-			spawnenemy[i] = 0 ; 
-			deathLocation = enemyLocation[i] ; 
-			score ++;
- 
-			createMissileL[j] = 0;
-			missileLLocation[j].X = charLocation.X;
-			missileLLocation[j].Y = charLocation.Y + 1;
-
-			if (ultiBar < 50)
-			{
-				ultiBar +=2;
-			}
-		}
 
 		}
 
@@ -224,11 +202,11 @@ void collisions()
 		else if (enemyLocation[i].X < 18 )
 		{
 
-		for ( int j = 0 ; j < 17 ; j++ ) //x dimension of player hitbox
+		for ( int l = 0 ; l < 17 ; l++ ) //x dimension of player hitbox
 		{ 
 			for ( int k = 0 ; k < 4 ; k++ ) //y dimension of player hitbox
 			{ 
-				if ( enemyLocation[i].X == charLocation.X + j && enemyLocation[i].Y == charLocation.Y + k) //if collide
+				if ( enemyLocation[i].X == charLocation.X + l && enemyLocation[i].Y == charLocation.Y + l ) //if collide
 				{ 
 					deathLocation = enemyLocation[i];
 					spawnenemy[i] = 0 ;
@@ -243,26 +221,133 @@ void collisions()
 	}
 }
 
+void Mothership10()
+{
+	for (int m = 0; m < 3; m++)
+	{
+
+	//Wave 10 - The Mothership
+	if (Mothership[m].createBoss == 0 && deathFrame == 0)
+	{
+		//initializing Mothership
+		if (m == 0)
+		{
+			Mothership[m].bossLocation.X = ConsoleSize.X - 13;
+			Mothership[m].bossLocation.Y = 5;
+		}
+
+		if (m == 1)
+		{
+			Mothership[m].bossLocation.X = ConsoleSize.X - 13;
+			Mothership[m].bossLocation.Y = 12;
+		}
+
+		if (m == 2)
+		{
+			Mothership[m].bossLocation.X = ConsoleSize.X - 13;
+			Mothership[m].bossLocation.Y = 19;
+		}
+
+		Mothership[m].health = 500;
+		Mothership[m].shield = false;
+		Mothership[m].createBoss = 1;
+	}
+
+	if (deathFrame > 0)
+	{
+		deathFrame++;		
+	}
+
+	if (deathFrame > 80)
+	{
+		score +=30;
+		currentWave++;
+		waveDelay = 0;
+		deathFrame = 0;
+	}
+
+	//Codename Pink's AI
+	if (Mothership[m].createBoss == 1 )
+	{
+		// Death condition
+		/*
+		if (Mothership[m].health <= 0)
+		{
+			deathFrame++;
+			Mothership[m].createBoss = 0;
+		}*/
+
+		if (Mothership[m].bossLocation.X > ConsoleSize.X - 15)//entering the frame
+		{
+			//spawnFrame++;
+			//Mothership[m].bossLocation.X--;
+		}
+
+		//Shoots projectiles when moving up and down
+		if (Mothership[m].bossLocation.X <= ConsoleSize.X - 15)
+		{
+			
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (fourMissiles == false && i == 2)
+			{
+				break;
+			}
+
+			for ( int k = -2 ; k < 5 ; k++ ) //Pink's Y hitbox
+			{	
+				if (missileLocation[i].X >= Mothership[m].bossLocation.X && missileLocation[i].Y == Mothership[m].bossLocation.Y + k)
+				{
+					Mothership[m].health -=10;
+					createMissile[i] = 0;
+					break;
+				}
+			}
+		}
+	
+		//Player's Hitbox
+		for ( int j = 0 ; j < 17 ; j++ ) 
+		{ 
+			for ( int k = 0 ; k < 4 ; k++ ) 
+			{ 
+				for (int i = 0; i <= Pink.index; i++)
+				{
+					if (Pink.bossProjectile[i].X == charLocation.X + j && Pink.bossProjectile[i].Y == charLocation.Y + k )
+					{	
+						Pink.createProj[i] = false;
+						Pink.bossProjectile[i] = nullLocation;
+						heart--;
+					}
+				}
+			} 
+		} 
+	}
+
+	}
+}
+
 void Pink5()
 {
 	//Wave 5 - Codename Pink
-	if (currentWave == 5 && Pink.createBoss == 0 && frame == 0)
+	if (Pink.createBoss == 0 && deathFrame == 0)
 	{
 		//initializing Pink
-		Pink.bossLocation.X = ConsoleSize.X - 2;
-		Pink.bossLocation.Y = ConsoleSize.Y / 2;
+		Pink.bossLocation.X = ConsoleSize.X ;
+		Pink.bossLocation.Y = (ConsoleSize.Y / 2) - 2;
 		Pink.health = 400;
 		Pink.moveDown = false; Pink.moveUp = false;
 		Pink.shield = false;
 		Pink.createBoss = 1;
 	}
 
-	if (frame > 0)
+	if (deathFrame > 0)
 	{
-		frame++;
-		for ( int k = -1 ; k < 5 ; k++ ) //Pink's Y hitbox
+		deathFrame++;
+		for ( int k = -1 ; k < 5 ; k++ ) 
 		{
-			for ( int j = -1 ; j < 10 ; j++ ) //Pink's X hitbox
+			for ( int j = -1 ; j < 10 ; j++ )
 			{	
 				if ((rand() % 60 + 1) == 5)
 				{
@@ -275,12 +360,12 @@ void Pink5()
 		
 	}
 
-	if (frame > 80)
+	if (deathFrame > 80)
 	{
 		score +=10;
 		currentWave++;
 		waveDelay = 0;
-		frame = 0;
+		deathFrame = 0;
 	}
 
 	//Codename Pink's AI
@@ -289,13 +374,14 @@ void Pink5()
 		// Death condition
 		if (Pink.health <= 0)
 		{
-			frame++;
 			Pink.createBoss = 0;
+			deathFrame++;
 			fourMissiles = 1;
 		}
 
 		if (Pink.bossLocation.X > ConsoleSize.X - 15)//entering the frame
 		{
+			spawnFrame++;
 			Pink.bossLocation.X--;
 
 			if (Pink.bossLocation.X <= ConsoleSize.X - 15)
@@ -339,23 +425,6 @@ void Pink5()
 				Pink.index++;
 			}
 		}
-	}
-		for (int i = 0; i < Pink.index; i++) //moving the projectile
-		{
-			if (Pink.createProj[i] == true)				
-			{
-				Pink.bossProjectile[i].X-=3;
-			}
-
-		}
-			
-		for (int i = 0; i < Pink.index; i++) //if out of the screen, despawn
-		{
-			if (Pink.bossProjectile[i].X < 0)
-			{
-				Pink.createProj[i] = false;
-			}
-		}
 
 		for (int i = 0; i < Pink.index; i++) //if there are no more projectiles on the screen, repeat
 		{
@@ -370,9 +439,6 @@ void Pink5()
 			}
 		}
 
-	//Boss #1 (Pink) Collisions
-	if (Pink.createBoss == 1)
-	{
 		for ( int k = 0 ; k < 4 ; k++ ) //Pink's Y hitbox
 		{	
 			//Ulti Collision
@@ -388,69 +454,68 @@ void Pink5()
 			}
 		}
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 4; i++)
 		{
+			if (fourMissiles == false && i == 2)
+			{
+				break;
+			}
+
 			for ( int k = 0 ; k < 4 ; k++ ) //Pink's Y hitbox
 			{	
 				if (Pink.shield == true)
 				{
-					if (( Pink.bossLocation.X - 8 <= missileRLocation[i].X) && (Pink.bossLocation.Y + k == missileRLocation[i].Y))
+					if (( Pink.bossLocation.X - 8 <= missileLocation[i].X) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
 					{
-						missileRLocation[i].X = charLocation.X + 8;
-						missileRLocation[i].Y = charLocation.Y + 1;
-						createMissileR[i] = 0;
-						break;
-					}
-
-					if (( Pink.bossLocation.X - 8 <= missileLLocation[i].X) && (Pink.bossLocation.Y + k == missileLLocation[i].Y))
-					{
-						missileLLocation[i].X = charLocation.X + 2;
-						missileLLocation[i].Y = charLocation.Y + 1;
-						createMissileL[i] = 0;
+						createMissile[i] = 0;
 						break;
 					}
 				}
 
 				if (Pink.shield == false)
 				{
-
-				for ( int j = 0 ; j < 9 ; j++ ) //Pink's X hitbox
-				{	
 					//Missile Collisions
-					if (( Pink.bossLocation.X + j <= missileRLocation[i].X) && (Pink.bossLocation.Y + k == missileRLocation[i].Y))
+					if (( Pink.bossLocation.X  <= missileLocation[i].X) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
 					{
 						Pink.health -=6;
-						createMissileR[i] = 0;
+						createMissile[i] = 0;
 						break;
 					}
-
-					if (( Pink.bossLocation.X + j <= missileLLocation[i].X) && (Pink.bossLocation.Y + k == missileLLocation[i].Y))
-					{
-						Pink.health -=6;
-						createMissileL[i] = 0;
-						break;
-					}
-				}
-
 				}
 			}
 		}
-	
-		//Player's Hitbox
-		for ( int j = 0 ; j < 17 ; j++ ) 
-		{ 
-			for ( int k = 0 ; k < 4 ; k++ ) 
-			{ 
-				for (int i = 0; i <= Pink.index; i++)
-				{
-					if (Pink.bossProjectile[i].X == charLocation.X + j && Pink.bossProjectile[i].Y == charLocation.Y + k )
-					{	
-						Pink.createProj[i] = false;
-						Pink.bossProjectile[i] = nullLocation;
-						heart--;
-					}
-				}
-			} 
-		} 
 	}
+
+	for (int i = 0; i < Pink.index; i++) //moving the projectile
+	{
+		if (Pink.createProj[i] == true)				
+		{
+			Pink.bossProjectile[i].X-=3;
+		}
+	}
+			
+	for (int i = 0; i < Pink.index; i++) //if out of the screen, despawn
+	{
+		if (Pink.bossProjectile[i].X < 0)
+		{
+			Pink.createProj[i] = false;
+		}
+	}
+
+	//Player's Hitbox
+	for ( int j = 0 ; j < 17 ; j++ ) 
+	{ 
+		for ( int k = 0 ; k < 4 ; k++ ) 
+		{ 
+			for (int i = 0; i <= Pink.index; i++)
+			{
+				if (Pink.bossProjectile[i].X == charLocation.X + j && Pink.bossProjectile[i].Y == charLocation.Y + k )
+				{	
+					Pink.createProj[i] = false;
+					Pink.bossProjectile[i] = nullLocation;
+					heart--;
+				}
+			}
+		} 
+	} 
 }

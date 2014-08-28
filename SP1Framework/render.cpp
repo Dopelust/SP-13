@@ -202,11 +202,11 @@ void renderPlayer()
 
 	if (fourMissiles == 1)
 	{
-		writeToBuffer (missileRLocation[1], "--===>", 0x0E);
-		writeToBuffer (missileLLocation[1], "--===>", 0x0E);
+		writeToBuffer (missileLocation[2], "--===>", 0x0E);
+		writeToBuffer (missileLocation[3], "--===>", 0x0E);
 	}
-	writeToBuffer (missileRLocation[0], "--===>", 0x0C);
-	writeToBuffer (missileLLocation[0], "--===>", 0x0C);
+	writeToBuffer (missileLocation[0], "--===>", 0x0C);
+	writeToBuffer (missileLocation[1], "--===>", 0x0C);
 	
 }
 
@@ -222,8 +222,26 @@ void renderBack()
 		writeToBuffer(c, "|", 0x04);
 		c.X++;
 	}
-	
-	if (currentWave > 0)
+
+	if (currentWave == 5 || currentWave == 10 || currentWave == 15 || currentWave == 20)
+	{
+		if (waveDelay % 2 == 0)
+		{
+			renderWaveAlt(); 
+		}
+
+		else
+		{
+			renderWave();
+		}		
+
+		if (waveDelay <= 12)
+		{
+			waveDelay++;
+		}
+	}
+
+	else if (currentWave > 0)
 	{
 		if (waveDelay % 2 == 0)
 		{
@@ -253,6 +271,137 @@ void renderBack()
 	
 }
 
+void renderPink()
+{
+	COORD c;
+
+	if ((Pink.createBoss == 1 || deathFrame <= 70) && currentWave == 5)
+	{
+		if (spawnFrame == 1)
+		{
+			c.X = Pink.bossLocation.X ; c.Y = Pink.bossLocation.Y + 2;
+			writeToBuffer (c , "(", 0x0D);
+		}
+		if (spawnFrame == 2)
+		{
+			c.X = Pink.bossLocation.X ; c.Y = Pink.bossLocation.Y + 2;
+			writeToBuffer (c , "(=", 0x0D);
+		}
+		if (spawnFrame == 3)
+		{
+			c.X = Pink.bossLocation.X + 2; c.Y = Pink.bossLocation.Y + 1;
+			writeToBuffer (c , "_", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=_", 0x0D);
+		}
+		if (spawnFrame == 4)
+		{
+			c.X = Pink.bossLocation.X + 2; c.Y = Pink.bossLocation.Y + 1;
+			writeToBuffer (c , "_-", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__", 0x0D);
+		}
+		if (spawnFrame == 5)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "/", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-=", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\", 0x0D);
+		}
+		if (spawnFrame == 6)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-==", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "-", 0x0D);
+		}
+		if (spawnFrame == 7)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//-", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-===", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\ ", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "--", 0x0D);
+		}
+		if (spawnFrame == 8)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-====", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  ", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "---", 0x0D);
+		}
+		if (spawnFrame == 9)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-=====", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  /", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+		if (spawnFrame == 10)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-======", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  //", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+		if (spawnFrame == 11)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-======-", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  //_", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+		if (spawnFrame == 12)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-======-_", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  //__", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+		if (spawnFrame == 13)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-======-_ ", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  //__=", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+		if (spawnFrame >= 14)
+		{
+			c.X = Pink.bossLocation.X + 4; c.Y = Pink.bossLocation.Y;
+			writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "_-======-_ ", 0x0D); c.X-=2; c.Y++;
+			writeToBuffer (c , "(=__\\\\  //__=)", 0x0D); c.X+=5; c.Y++;
+			writeToBuffer (c , "----", 0x0D);
+		}
+
+		if (Pink.shield == true)
+		{
+			c.X = ConsoleSize.X - 18;
+			c.Y = Pink.bossLocation.Y - 1;
+			writeToBuffer (c , " /", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , "|", 0x0D); c.Y++;
+			writeToBuffer (c , " \\", 0x0D);
+		}
+
+		for (int i = 0; i < Pink.index; i++)
+		{
+			if (Pink.createProj[i] == true)
+			{
+				writeToBuffer (Pink.bossProjectile[i] , "-", 0x0E);
+			}
+		}
+	}
+
+}
+
 void renderWave()
 {
 	COORD c;
@@ -262,16 +411,16 @@ void renderWave()
 
 	if (currentWave != 0 && currentWave %5 == 0)
 	{
-		writeToBuffer (c , "          .                                                      ." , 0x04); c.Y++;
-		writeToBuffer (c , "        .n                   .                 .                  n." , 0x04); c.Y++;
-		writeToBuffer (c , "  .   .dP                  dP                   9b                 9b.    ." , 0x04); c.Y++;
-		writeToBuffer (c , " 4    qXb         .       dX                     Xb       .        dXp     t" , 0x04); c.Y++;
-		writeToBuffer (c , "dX.    9Xb      .dXb    __                         __    dXb.     dXP     .Xb " , 0x04); c.Y++;
-		writeToBuffer (c , "9XXb._       _.dXXXXb dXXXXbo.                 .odXXXXb dXXXXb._       _.dXXP" , 0x04); c.Y++;
-		writeToBuffer (c , " 9XXXXXXXXXXXXXXXXXXXVXXXXXXXXOo.           .oOXXXXXXXXVXXXXXXXXXXXXXXXXXXXP" , 0x04); c.Y++;
-		writeToBuffer (c , "  `9XXXXXXXXXXXXXXXXXXXXX'~   ~`OOO8b   d8OOO'~   ~`XXXXXXXXXXXXXXXXXXXXXP'" , 0x04); c.Y++;
-		writeToBuffer (c , "    `9XXXXXXXXXXXP' `9XX'          `98v8P'          `XXP' `9XXXXXXXXXXXP'" , 0x04); c.Y++;
-		writeToBuffer (c , "        ~~~~~~~       9X.          .db|db.          .XP       ~~~~~~~" , 0x04); c.Y++;
+		writeToBuffer (c , "                                                          " , 0x04); c.Y++;
+		writeToBuffer (c , "                             .                 .          " , 0x04); c.Y++;
+		writeToBuffer (c , "                           dP                   9b        " , 0x04); c.Y++;
+		writeToBuffer (c , "                          dX                     Xb       " , 0x04); c.Y++;
+		writeToBuffer (c , "                        __                         __        " , 0x04); c.Y++;
+		writeToBuffer (c , "                    ,6dXXXXbo.                 .odXXXXbb, " , 0x04); c.Y++;
+		writeToBuffer (c , "                   XXVXXXXXXXXOo.           .oOXXXXXXXXVXX " , 0x04); c.Y++;
+		writeToBuffer (c , "                   XXXXXX'~   ~`OOO8b   d8OOO'~   ~`XXXXXX" , 0x04); c.Y++;
+		writeToBuffer (c , "                    `9XX'          `98v8P'          `XXP' " , 0x04); c.Y++;
+		writeToBuffer (c , "                      9X.          .db|db.          .XP       " , 0x04); c.Y++;
 		writeToBuffer (c , "                        )b.  .dbo.dP'`v'`9b.odb.  .dX(" , 0x04); c.Y++;
 		writeToBuffer (c , "                      ,dXXXXXXXXXXXb     dXXXXXXXXXXXb." , 0x04); c.Y++;
 		writeToBuffer (c , "                     dXXXXXXXXXXXP'   .   `9XXXXXXXXXXXb" , 0x04); c.Y++;
