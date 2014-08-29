@@ -16,7 +16,8 @@ void renderMenu()
 	writeToBuffer ( c, "      / \\ | |_| |_ __ _  ___| | __   ___  _ __   / ___| _ __   __ _  ___ ___ ", 0x0A); c.Y++;
 	writeToBuffer ( c, "     / _ \\| __| __/ _` |/ __| |/ /  / _ \\| '_ \\  \\___ \\| '_ \\ / _` |/ __/ _ \\", 0x0A); c.Y++;
 	writeToBuffer ( c, "    / ___ \\ |_| || (_| | (__|   <  | (_) | | | |  ___) | |_) | (_| | (_|  __/", 0x0A); c.Y++;
-	writeToBuffer ( c, "   /_/   \\_\\__|\\__\\__,_|\\\___|_|\\_\\  \\___/|_| |_| |____/| .__/ \\__,_|\\___\\___|", 0x0A); c.Y+=2;
+	writeToBuffer ( c, "   /_/   \\_\\__|\\__\\__,_|\\\___|_|\\_\\  \\___/|_| |_| |____/| .__/ \\__,_|\\___\\___|", 0x0A); c.Y++;
+	writeToBuffer ( c, "                                                       | |                 ", 0x0A); c.Y++;
 	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
 	if (pointerLocation.Y == c.Y)
 	{
@@ -67,6 +68,116 @@ void renderMenu()
 	writeToBuffer ( pointerLocation , ">", 0x0A);
 }
 
+void renderInstruction()
+{
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	writeToBuffer ( c, "    _____           _                   _   _             ", 0x0A); c.Y++;
+	writeToBuffer ( c, "    \\_   \\_ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __  ", 0x0A); c.Y++;
+	writeToBuffer ( c, "     / /\\/ '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ ", 0x0A); c.Y++;
+	writeToBuffer ( c, "  /\\/ /_ | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |" , 0x0A); c.Y++;
+	writeToBuffer ( c, "  \\____/ |_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|", 0x0A); c.Y++;
+	writeToBuffer ( c, "                                                         ", 0x0A); c.Y++;
+	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
+	writeToBuffer ( c, "        1.Defend yourself from the aliens!", 0x0A);c.Y++;
+	writeToBuffer ( c, "        2.Press 'spacebar' to fire your missles!", 0x0A);c.Y++;
+	writeToBuffer ( c, "        3.Press 'z' to fire your laser!(Has cooldown and does not work on bosses)", 0x0A);c.Y++;
+	writeToBuffer ( c, "        4.After wave 4, there will be a boss battle", 0x0A);c.Y++;
+	writeToBuffer ( c, "        5.Have fun!!!", 0x0A);c.Y=18;
+	writeToBuffer ( c, "        Return to Menu" , 0x0A);c.Y=22;
+	writeToBuffer ( c, "================================================================================", 0x0A);
+	writeToBuffer ( pointerLocation , ">", 0x0A);
+}
+
+void renderHighscore()
+{ 
+	ifstream Read;
+	ifstream Read2;
+
+	string seethis;
+	string words;
+	string b; 
+
+	COORD c ; 
+
+	c.X = 0;
+	c.Y = 0;
+	writeToBuffer ( c, "      __                _           _                         _ ", 0x0A); c.Y++;
+	writeToBuffer ( c, "     / /  ___  __ _  __| | ___ _ __| |__   ___   __ _ _ __ __| |", 0x0A); c.Y++;
+	writeToBuffer ( c, "    / /  / _ \\/ _` |/ _` |/ _ \\ '__| '_ \\ / _ \\ / _` | '__/ _` |", 0x0A); c.Y++;
+	writeToBuffer ( c, "   / /__|  __/ (_| | (_| |  __/ |  | |_) | (_) | (_| | | | (_| |" , 0x0A); c.Y++;
+	writeToBuffer ( c, "   \\____/\\___|\\__,_|\\__,_|\\___|_|  |_.__/ \\___/ \\__,_|_|  \\__,_|", 0x0A); c.Y++;
+	writeToBuffer ( c, "                                                         ", 0x0A); c.Y++;
+	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
+
+	c.X = 8; c.Y = 10;
+	writeToBuffer ( c, "#1" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#2" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#3" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#4" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#5" , 0x0A);c.Y++;
+
+	Read.open ("highscores.txt" ) ;  
+	Read2.open ("highscorename.txt" ) ; 
+
+	if (Read.is_open() && Read2.is_open() )
+	{ 
+		for ( int z = 0 ; z < 5 ; z++ ) 
+		{
+			getline(Read2,b);
+			c.X = 11;
+			c.Y = 10 + z ;
+			seethis = b;
+			writeToBuffer ( c , seethis , 0x0A ) ;
+
+			getline(Read,words);
+			c.X = 18;
+			seethis = words  ; 
+			writeToBuffer ( c , seethis , 0x0A ) ;
+		}
+	}
+
+	Read.close();
+	Read2.close();
+
+	c.X = 0;
+	c.Y = 18;
+
+	writeToBuffer ( c, "        Return to Menu" , 0x0A);c.Y=22;
+	writeToBuffer ( c, "================================================================================", 0x0A);
+	writeToBuffer ( pointerLocation , ">", 0x0A);
+} 
+
+void renderCredit()
+{ 
+	COORD c;
+	c.X=1;
+	c.Y=1;
+	writeToBuffer(c," Thank you for playing our game! We Hope you enjoyed it.",0x0A);c.Y+=2;
+	writeToBuffer(c," Credits go to : ", 0x0A);c.Y++;
+	writeToBuffer(c,"__________.__                                   ", 0x0A);c.Y++;
+	writeToBuffer(c,"\\______   \\__| ____   ______ __________   ____  ", 0x0A);c.Y++;
+	writeToBuffer(c," |       _/  |/ ___\\ /  ___//  ___/  _ \\ /    \\ ", 0x0A);c.Y++;
+	writeToBuffer(c," |    |   \\  \\  \\___ \\___ \\ \\___ (  <_> )   |  \\ ", 0x0A);c.Y++;
+	writeToBuffer(c," |____|_  /__|\\___  >____  >____  >____/|___|  /", 0x0A);c.Y++;
+	writeToBuffer(c,"   _____              .___      ", 0x0A);c.Y++;
+	writeToBuffer(c,"  /  _  \\   ____    __| _/__.__.", 0x0A);c.Y++;
+	writeToBuffer(c," /  /_\\  \\ /    \\  / __ <   |  |", 0x0A);c.Y++;
+	writeToBuffer(c,"/    |    \\   |  \\/ /_/ |\\___  |", 0x0A);c.Y++;
+	writeToBuffer(c,"\\____|__  /___|  /\\____ |/ ____|", 0x0A);c.Y++;
+	writeToBuffer(c,"     ____.              _________             ", 0x0A);c.Y++;
+	writeToBuffer(c,"    |    |__ __  ____  /   _____/ ____   ____  ", 0x0A);c.Y++;
+	writeToBuffer(c,"    |    |  |  \\/    \\ \\_____  \\_/ __ \\ /    \\ ", 0x0A);c.Y++;
+	writeToBuffer(c,"/\\__|    |  |  /   |  \\/        \\  ___/|   |  \\", 0x0A);c.Y++;
+	writeToBuffer(c,"\\________|____/|___|  /_______  /\\___  >___|  /", 0x0A);c.Y++;
+	writeToBuffer(c,".____       _____  __________  _____ __________ ____ ___  _________", 0x0A);c.Y++;
+	writeToBuffer(c,"|    |     /  _  \\ \\____    / /  _  \\\\______   \\    |   \\/   _____/", 0x0A);c.Y++;
+	writeToBuffer(c,"|    |    /  /_\\  \\  /     / /  /_\\  \\|       _/    |   /\\_____  \\ ", 0x0A);c.Y++;
+	writeToBuffer(c,"|    |___/    |    \\/     /_/    |    \\    |   \\    |  / /        \\", 0x0A);c.Y++;
+	writeToBuffer(c,"|_______ \\____|__  /_______ \\____|__  /____|_  /______/ /_______  /", 0x0A);c.Y++;
+} 
+
 void renderUI()
 {
 	COORD c;
@@ -115,7 +226,7 @@ void renderUI()
 		c.X+=2;
 	}
 
-	if (pause == true)
+	if (state == pause)
 	{
 		c.X = ConsoleSize.X - 60;
 		c.Y = ( ConsoleSize.Y / 2 ) - 6;

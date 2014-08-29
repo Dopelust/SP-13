@@ -36,6 +36,16 @@ enum Keys
 	K_Z
 };
 
+enum gameState
+{
+	menu,
+	play,
+	rule,
+	leaderboard,
+	credits,
+	pause
+};
+
 void init();                // initialize your variables, allocate memory, etc
 void getInput();            // get input from player
 void update(double dt);     // update the game and the state of the game
@@ -53,15 +63,22 @@ void updateScore();
 void renderUI();
 void renderPlayer();
 void renderBack();
-void renderMenu();
 void gameOver();
 void renderWave();
 void renderWaveAlt();
 void renderPink();
 
+void renderMenu();
+void renderInstruction();
+void renderHighscore();
+void renderCredit(); 
+
+void menuBgm();
 void tutorial();
 void Pink5();
 void Mothership10();
+
+extern gameState state;
 
 //Requisite
 extern double elapsedTime;
@@ -94,8 +111,6 @@ extern bool fourMissiles;
 extern COORD deathLocation;
 extern COORD nullLocation;
 extern COORD pointerLocation;
-extern bool pause;
-extern bool menu;
 extern bool delay;
 extern int waveDelay;
 extern int deathFrame;
@@ -105,5 +120,5 @@ extern void comet();
 extern int comets;
 extern COORD cometLocation[30]; 
 extern bool spawnComet[30];
-
+extern int musicFrame;
 #endif // _GAME_H

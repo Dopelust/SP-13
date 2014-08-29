@@ -45,6 +45,18 @@ void mainLoop()
 		{
 			gameOver();
 			cin >> names;
+
+			while ( names.length() > 7 ) 
+			{ 
+				clearBuffer(0x0F);
+				COORD c ; 
+				c.X = 0 ; 
+				c.Y = 10; 
+				writeToBuffer( c, " Only names less than 7 characters " , 0x0A ) ; 
+				cin >> names ; 
+				flushBufferToConsole();
+			} 
+
 			updateScore();
 			g_quitGame= true;
 		}

@@ -6,6 +6,8 @@ int enemy = 0 ;
 int dummy = 0 ; 
 int tutdelay = 0;
 
+int wait = 0;
+
 void tutorial()
 {
 	if ( promptCondition[0] == false) 
@@ -64,11 +66,11 @@ void tutorial()
 
 	if (dummyLocation.X < 18 )
 	{
-		for ( int j = 0 ; j < 17 ; j++ ) //x dimension of player hitbox
+		for ( int j = 0 ; j < 14 ; j++ ) //x dimension of player hitbox
 		{ 
 			for ( int k = 0 ; k < 4 ; k++ ) //y dimension of player hitbox
 			{ 
-				if ( dummyLocation.X == charLocation.X + j && dummyLocation.Y == charLocation.Y + k) //if collide
+				if ( dummyLocation.X >= charLocation.X + j && dummyLocation.Y == charLocation.Y + k) //if collide
 				{ 
 					promptCondition[2] = true;
 					deathLocation = dummyLocation;
@@ -202,11 +204,11 @@ void collisions()
 		else if (enemyLocation[i].X < 18 )
 		{
 
-		for ( int l = 0 ; l < 17 ; l++ ) //x dimension of player hitbox
+		for ( int l = 0 ; l < 14 ; l++ ) //x dimension of player hitbox
 		{ 
 			for ( int k = 0 ; k < 4 ; k++ ) //y dimension of player hitbox
 			{ 
-				if ( enemyLocation[i].X == charLocation.X + l && enemyLocation[i].Y == charLocation.Y + l ) //if collide
+				if ( enemyLocation[i].X >= charLocation.X + l && enemyLocation[i].Y == charLocation.Y + l ) //if collide
 				{ 
 					deathLocation = enemyLocation[i];
 					spawnenemy[i] = 0 ;
@@ -223,11 +225,18 @@ void collisions()
 
 void Mothership10()
 {
+	wait ++;
+
+	if (wait > 21)
+	{
+		wait = 0;
+	}
+
 	for (int m = 0; m < 3; m++)
 	{
 
 	//Wave 10 - The Mothership
-	if (Mothership[m].createBoss == 0 && deathFrame == 0)
+	if (Mothership[m].createBoss == 0 && deathFrame == 0 && Mothership[m].health > 0)
 	{
 		//initializing Mothership
 		if (m == 0)
@@ -253,40 +262,83 @@ void Mothership10()
 		Mothership[m].createBoss = 1;
 	}
 
-	if (deathFrame > 0)
+	if (Mothership[m].createBoss == 0 && deathFrame > 0)
 	{
-		deathFrame++;		
+		deathFrame++;	
+
+		for ( int k = -2 ; k < 5 ; k++ ) 
+		{
+			for ( int j = -1 ; j < 10 ; j++ )
+			{	
+				if ((rand() % 60 + 1) == 5)
+				{
+					deathLocation.X = Mothership[Mothership[0].index].bossLocation.X + j;
+					deathLocation.Y = Mothership[Mothership[0].index].bossLocation.Y + k;
+					break;
+				}
+			}
+		}
 	}
 
 	if (deathFrame > 80)
 	{
 		score +=30;
-		currentWave++;
-		waveDelay = 0;
 		deathFrame = 0;
 	}
 
+	for (int i = 0; i < 5; i++)
+	{
+		if (Mothership[m].createProj[i] == true && delay == 1)
+		{
+			Mothership[m].bossProjectile[i].X--;
+		}
+
+		if (Mothership[m].bossProjectile[i].X == 0)
+		{
+			Mothership[m].createProj[i] = false;
+		}
+
+		for ( int k = 0; k < 4; k++)
+		{
+			if (fourMissiles == false && k == 2)
+			{
+				break;
+			}
+			if (Mothership[m].createProj[i] == true && missileLocation[k].X >= Mothership[m].bossProjectile[i].X && missileLocation[k].Y == Mothership[m].bossProjectile[i].Y)
+			{
+				deathLocation = Mothership[m].bossProjectile[i];
+				createMissile[k] = false;
+				Mothership[m].createProj[i] = false;
+				break;
+			}
+		}
+	}
 	//Codename Pink's AI
 	if (Mothership[m].createBoss == 1 )
 	{
 		// Death condition
-		/*
 		if (Mothership[m].health <= 0)
 		{
 			deathFrame++;
+			Mothership[0].index = m;
 			Mothership[m].createBoss = 0;
-		}*/
-
-		if (Mothership[m].bossLocation.X > ConsoleSize.X - 15)//entering the frame
-		{
-			//spawnFrame++;
-			//Mothership[m].bossLocation.X--;
 		}
 
-		//Shoots projectiles when moving up and down
-		if (Mothership[m].bossLocation.X <= ConsoleSize.X - 15)
-		{
-			
+		for (int i = 0; i < 5; i++)
+		{				
+			if (Mothership[m].createProj[i] == false && wait == 21 && Mothership[m].createProj[4] == false)
+			{
+				Mothership[m].createProj[i] = true;
+				Mothership[m].bossProjectile[i].X = Mothership[m].bossLocation.X;
+				Mothership[m].bossProjectile[i].Y = Mothership[m].bossLocation.Y + 1;
+				break;
+			}
+
+			else if (Mothership[m].createProj[i] == false ) 
+			{ 
+				Mothership[m].bossProjectile[i].X = 1 ;
+				Mothership[m].bossProjectile[i].Y = 1 ;
+			} 
 		}
 
 		for (int i = 0; i < 4; i++)
@@ -296,7 +348,15 @@ void Mothership10()
 				break;
 			}
 
-			for ( int k = -2 ; k < 5 ; k++ ) //Pink's Y hitbox
+			for ( int k = -2 ; k < 5 ; k++ )
+			{	
+				if (ultiLocation.Y == Mothership[m].bossLocation.Y + k)
+				{
+					Mothership[m].health -=5;
+				}
+			}
+
+			for ( int k = -2 ; k < 5 ; k++ )
 			{	
 				if (missileLocation[i].X >= Mothership[m].bossLocation.X && missileLocation[i].Y == Mothership[m].bossLocation.Y + k)
 				{

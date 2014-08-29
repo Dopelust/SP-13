@@ -5,6 +5,8 @@
 
 bool keyPressed[K_COUNT];
 
+gameState state = play;
+
 //Requisite
 COORD ConsoleSize = {80,25};
 double elapsedTime;
@@ -14,7 +16,7 @@ Boss Pink;
 Boss Mothership[3];
 //Player
 string names;
-int heart = 15;
+int heart = 5;
 int score = 0; 
 bool createMissile[4];
 COORD missileLocation[4];
@@ -23,7 +25,7 @@ int ultiBar = 50;
 COORD charLocation;
 COORD ultiLocation;
 //Enemy
-int currentWave = 10;
+int currentWave = 0;
 bool spawnenemy[20]; 
 COORD enemyLocation[20];
 //Tutorial
@@ -32,11 +34,9 @@ bool promptCondition[5];
 bool spawndummy = 0 ;
 COORD dummyLocation; 
 //PowerUps
-bool laserSight = 1;
-bool fourMissiles = 1;
+bool laserSight = 0;
+bool fourMissiles = 0;
 //Misc
-bool pause = 0;
-bool menu = 1;
 int comets = 1; 
 bool delay = 0; //for blue asteroids and stars
 int waveDelay = 0; //blinks the Wave
@@ -49,9 +49,18 @@ COORD pointerLocation;
 void comet(); 
 COORD cometLocation[30]; 
 bool spawnComet[30];
+int musicFrame = 0;
 
 void init()
 {
+	heart = 5 ; 
+	score = 0 ; 
+	ultiBar = 50; 
+	currentWave = 10 ; 
+	enemyLocation[0].X = ConsoleSize.X - 5;
+	laserSight = 0 ; 
+	fourMissiles = 0 ; 
+
     //time
     elapsedTime = 0.0;
 
@@ -69,6 +78,10 @@ void init()
 	//tutorial dummy
 	dummyLocation.X = ConsoleSize.X - 5;
 	dummyLocation.Y = ( ConsoleSize.Y / 2 ) + 3;
+
+	Mothership[0].health = 1;
+	Mothership[1].health = 1;
+	Mothership[2].health = 1;
 
 	//background
 	for ( int i = 0 ; i < 30 ; i++ ) 
@@ -97,7 +110,7 @@ void getInput()
 
 void update(double dt)
 {
-	if (!pause && !menu)
+	if (state == play)
 	{
 		 // get the delta time
 		elapsedTime += dt;
@@ -119,9 +132,14 @@ void update(double dt)
 			}
 		}
 
+		if (laserSight == false && currentWave > 1)
+		{
+			laserSight = true;
+		}
+
 		if (keyPressed[K_ESCAPE])
 		{
-			pause = true;
+			state = pause;
 			pointerLocation.X = ConsoleSize.X - 45; 
 			pointerLocation.Y = (ConsoleSize.Y / 2) - 2; 
 		}
@@ -156,8 +174,10 @@ void update(double dt)
 		}
 	}
 
-	else if (menu == true)
+	else if (state == menu)
 	{
+		menuBgm();
+
 		if (keyPressed[K_UP] && pointerLocation.Y != 10)
 		{
 			pointerLocation.Y-=2; 
@@ -174,28 +194,70 @@ void update(double dt)
 		{
 			if (pointerLocation.Y == 10) //Play
 			{
-				menu = false;
+				init(); 
+				musicFrame = 0;
+				state = play;
 			}
 			else if (pointerLocation.Y == 12) //Instructions
 			{
-				
+				state = rule;
+				pointerLocation.X = 6; 
+				pointerLocation.Y = 18; 
 			}	
 			else if (pointerLocation.Y == 14) //Leaderboard
 			{
-			
+				state = leaderboard;
+				pointerLocation.X = 6; 
+				pointerLocation.Y = 18; 
 			}
 			else if (pointerLocation.Y == 16) //Credits
 			{
-				
+				state = credits;
 			}
 			else if (pointerLocation.Y == 18) //Exit
 			{
-
+				g_quitGame = true;
 			}
 		}
 	}
 	
-	if (pause == true)
+	else if (state == rule)
+	{
+		menuBgm();
+
+		if (keyPressed[K_X])
+		{
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 10; 
+		}
+	}
+
+	else if (state == leaderboard)
+	{
+		menuBgm();
+
+		if (keyPressed[K_X])
+		{
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 10; 
+		}
+	}
+
+	else if (state == credits)
+	{
+		menuBgm();
+
+		if (keyPressed[K_ESCAPE])
+		{
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 10; 
+		}
+	}
+
+	if (state == pause)
 	{
 		if (keyPressed[K_UP] && pointerLocation.Y != (ConsoleSize.Y / 2) - 2)
 		{
@@ -213,12 +275,11 @@ void update(double dt)
 		{
 			if(pointerLocation.Y == (ConsoleSize.Y/2)-2)
 			{
-				pause = false;
+				state = play;
 			}
 			else if (pointerLocation.Y == (ConsoleSize.Y/2))
 			{
-				pause = false;
-				menu = true;
+				state = menu;
 				pointerLocation.X = 6; 
 				pointerLocation.Y = 10; 
 			}	
@@ -240,9 +301,24 @@ void render()
 
 	COORD c;
 	
-	if (menu == true)
+	if (state == menu)
 	{
 		renderMenu();
+	}
+
+	else if (state == rule)
+	{
+		renderInstruction();
+	}
+
+	else if (state == leaderboard)
+	{
+		renderHighscore();
+	}
+
+	else if (state == credits)
+	{
+		renderCredit();
 	}
 
 	else
@@ -312,6 +388,18 @@ void render()
 
 	renderPink();
 
+	for ( int m = 0; m < 3; m++)
+	{
+
+	for (int i = 0; i < 24; i++)
+	{
+		if (Mothership[m].createProj[i] == true)
+		{
+			writeToBuffer (Mothership[m].bossProjectile[i] , "Û±°", 0x09);
+		}
+	}
+
+	}
 	for ( int m = 0; m < 3; m++)
 	{
 		if (Mothership[m].createBoss == true)
@@ -392,30 +480,6 @@ void render()
 void missile()
 {
 	//calls missile creation when space is pressed
-	if (keyPressed[K_SPACE])
-    {
-		promptCondition[1] = true;
-
-		if (createMissile[0] == 0 && createMissile[3] == 0)
-		{
-			createMissile[0] = 1;
-		}
-
-		else if (fourMissiles == true && createMissile[2] == 0  && createMissile[3] == 0)
-		{
-			createMissile[2] = 1;
-		}
-
-		else if (createMissile[0] == 1 && createMissile[1] == 0 && createMissile[3] == 0)
-		{
-			createMissile[1] = 1;
-		}
-
-		else if (fourMissiles == true && createMissile[3] == 0)
-		{	
-			createMissile[3] = 1;
-		}
-	}
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -444,6 +508,31 @@ void missile()
 		{
 			missileLocation[i].X = charLocation.X + 2;
 			missileLocation[i].Y = charLocation.Y + 1; //follow the player
+		}
+	}
+
+	if (keyPressed[K_SPACE])
+    {
+		promptCondition[1] = true;
+
+		if (createMissile[0] == 0 && createMissile[3] == 0)
+		{
+			createMissile[0] = 1;
+		}
+
+		else if (fourMissiles == true && createMissile[2] == 0  && createMissile[3] == 0)
+		{
+			createMissile[2] = 1;
+		}
+
+		else if (createMissile[0] == 1 && createMissile[1] == 0 && createMissile[3] == 0)
+		{
+			createMissile[1] = 1;
+		}
+
+		else if (fourMissiles == true && createMissile[3] == 0)
+		{	
+			createMissile[3] = 1;
 		}
 	}
 }
@@ -627,3 +716,53 @@ void comet()
 	}
 	
 } 
+
+void menuBgm()
+{
+	switch (musicFrame)
+	{
+	case 0 : Beep (277,200); break;
+	case 1 : Beep (277,200); break;
+	case 2 : Beep (329,200); break;
+	case 3 : Beep (311,400); break;
+	case 4 : Beep (246,200); break;
+	case 5 : Beep (277,500); break;
+	case 6 : Beep (277,200); break;
+	case 7 : Beep (329,200); break;  
+	case 8 : Beep (311,400); break; 
+	case 9: Beep (246,200); Sleep(400); break;
+	case 10 : Beep (415,300); break;
+	case 11 : Beep (329,300); break; 
+	case 12: Beep (369,300); break;
+	case 13: Beep (311,300); break; 
+	case 14: Beep (329,300); break;
+	case 15: Beep (277,300); break; 
+	case 16: Beep (311,400); break; 
+	case 17: Beep (246,300); Sleep(200); break; 
+	case 18: Beep (415,300);  break; 
+	case 19: Beep (329,300);  break; 
+	case 20: Beep (369,300); break; 
+	case 21: Beep (311,300); break; 
+	case 22: Beep (329,300); break; 
+	case 23: Beep (311,300); break; 
+	case 24: Beep (277,300); break; 
+	case 25: Beep (246,300); Sleep (200); break; 
+	case 26: Beep (493,300); break; 
+	case 27: Beep (392,300); break; 
+	case 28: Beep (440,300);  break; 
+	case 29: Beep (369,300); break; 
+	case 30: Beep (392,300); break; 
+	case 31: Beep (329,300); break; 
+	case 32: Beep (369,300);  break; 
+	case 33: Beep (293,300); Sleep (200); break; 
+	case 34: Beep (493,300); Sleep (100);  break; 
+	case 35: Beep (392,300);  Sleep (100); break; 
+	case 36: Beep (440,300);  break; 
+	case 37: Beep (369,300); break; 
+	case 38: Beep (392,300); break; 
+	case 39: Beep (369,300); break; 
+	case 40: Beep (329,300); break; 
+	case 41: Beep (311,300); Sleep(200); musicFrame = 9; break; 
+	}
+	musicFrame++;
+}
