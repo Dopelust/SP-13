@@ -113,7 +113,7 @@ extern COORD nullLocation;
 extern COORD pointerLocation;
 extern bool delay;
 extern int waveDelay;
-extern int deathFrame;
+extern int deathFrame[3];
 extern int spawnFrame;
 //Background
 extern void comet(); 

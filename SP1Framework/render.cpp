@@ -386,7 +386,7 @@ void renderPink()
 {
 	COORD c;
 
-	if ((Pink.createBoss == 1 || deathFrame <= 70) && currentWave == 5)
+	if ((Pink.createBoss == 1 || deathFrame[0] <= 70) && currentWave == 5)
 	{
 		if (spawnFrame == 1)
 		{

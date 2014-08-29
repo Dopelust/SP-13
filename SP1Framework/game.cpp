@@ -40,7 +40,7 @@ bool fourMissiles = 0;
 int comets = 1; 
 bool delay = 0; //for blue asteroids and stars
 int waveDelay = 0; //blinks the Wave
-int deathFrame = 0; //boss death animation
+int deathFrame[3]; //boss death animation
 int spawnFrame = 0; //boss spawn animation
 COORD deathLocation;
 COORD nullLocation;
@@ -53,13 +53,16 @@ int musicFrame = 0;
 
 void init()
 {
-	heart = 5 ; 
-	score = 0 ; 
+	heart = 9 ; 
+	score = 45 ; 
 	ultiBar = 50; 
-	currentWave = 10 ; 
+	currentWave = 5 ; 
 	enemyLocation[0].X = ConsoleSize.X - 5;
+	createMissile[0] = 0 ; 
+	createMissile[1] = 0 ;
 	laserSight = 0 ; 
 	fourMissiles = 0 ; 
+	createUlti = 0 ;
 
     //time
     elapsedTime = 0.0;
