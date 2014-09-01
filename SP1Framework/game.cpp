@@ -1,64 +1,31 @@
 ﻿#include "game.h"
+#include "declare.h"
 #include "Framework\console.h"
 #include <iostream>
 #include <iomanip>
 
-bool keyPressed[K_COUNT];
+void shutdown()
+{
+    // Reset to white text on black background
+	colour(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+}
 
-gameState state = menu;
-
-//Requisite
-COORD ConsoleSize = {80,25};
-double elapsedTime;
-double deltaTime;
-//Boss
-Boss Pink;
-Boss Mothership[3];
-//Player
-string names;
-int heart = 5;
-int score = 0; 
-bool createMissile[4];
-COORD missileLocation[4];
-bool createUlti = 0;
-int ultiBar = 50;
-COORD charLocation;
-COORD ultiLocation;
-//Enemy
-int currentWave = 10;
-bool spawnenemy[20]; 
-COORD enemyLocation[20];
-//Tutorial
-bool prompt[6];
-bool promptCondition[5];
-bool spawndummy = 0 ;
-COORD dummyLocation; 
-//PowerUps
-bool laserSight = 0;
-bool fourMissiles = 0;
-//Misc
-int comets = 1; 
-bool delay = 0; //for blue asteroids and stars
-int waveDelay = 0; //blinks the Wave
-int deathFrame[3]; //boss death animation
-int spawnFrame = 0; //boss spawn animation
-COORD explosionLocation;
-COORD deathLocation;
-COORD nullLocation;
-COORD pointerLocation;
-//Background
-void comet(); 
-COORD cometLocation[30]; 
-bool spawnComet[30];
-bool collide = 0;
-bool playerCollide = 0;
+void getInput()
+{    
+    keyPressed[K_UP] = isKeyPressed(VK_UP);
+    keyPressed[K_DOWN] = isKeyPressed(VK_DOWN);
+    keyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+    keyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
+	keyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
+	keyPressed[K_Z] = isKeyPressed(0x5A);
+}
 
 void init()
 {
-	heart = 5 ; 
-	score = 45 ; 
-	ultiBar = 50; 
-	currentWave = 5; 
+	heart = 15 ; 
+	score = 0 ; 
+	ultiBar = 100; 
+	currentWave = 14; 
 	enemyLocation[0].X = ConsoleSize.X - 5;
 	createMissile[0] = 0 ; 
 	createMissile[1] = 0 ;
@@ -97,27 +64,21 @@ void init()
 	}
 }
 
-void shutdown()
-{
-    // Reset to white text on black background
-	colour(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-}
-
-void getInput()
-{    
-    keyPressed[K_UP] = isKeyPressed(VK_UP);
-    keyPressed[K_DOWN] = isKeyPressed(VK_DOWN);
-    keyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-    keyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
-	keyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
-	keyPressed[K_Z] = isKeyPressed(0x5A);
-}
-
 void update(double dt)
 {
+	if (delay == 1)
+	{
+		delay = 0;
+	}
+
+	else if (delay == 0)
+	{
+		delay = 1;
+	}
+
 	if (state == play)
 	{
-		 // get the delta time
+		// get the delta time
 		elapsedTime += dt;
 		deltaTime = dt;
 
@@ -135,6 +96,11 @@ void update(double dt)
 				currentWave++;
 				waveDelay = 0;
 			}
+		}
+
+		if (waveDelay <= 10)
+		{
+			waveDelay++;
 		}
 
 		if (laserSight == false && currentWave > 1)
@@ -164,8 +130,6 @@ void update(double dt)
 
 		playerProjectile();
 		createEnemy();
-
-		//playerProjectile();
 
 		if (currentWave == 5)
 		{
@@ -225,12 +189,11 @@ void update(double dt)
 			state = menu;
 			pointerLocation.X = 6; 
 			pointerLocation.Y = 18; 
-
 		}
 
 		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
 		{
-			Beep (26000,200);
+			Beep (10000,200);
 
 			if (pointerLocation.Y == 10) //Play
 			{
@@ -296,7 +259,7 @@ void update(double dt)
 		{
 			if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
 			{
-				Beep (26000,200);
+				Beep (10000,200);
 				state = menu;
 				pointerLocation.X = 6; 
 				pointerLocation.Y = 12; 
@@ -316,7 +279,7 @@ void update(double dt)
 
 		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
 		{
-			Beep (26000,200);
+			Beep (10000,200);
 			state = menu;
 			pointerLocation.X = 6; 
 			pointerLocation.Y = 14; 
@@ -334,7 +297,7 @@ void update(double dt)
 		}
 	}
 
-	if (state == pause)
+	else if (state == pause)
 	{
 		if (keyPressed[K_UP] && pointerLocation.Y != (ConsoleSize.Y / 2) - 2)
 		{
@@ -350,7 +313,7 @@ void update(double dt)
 
 		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
 		{
-			Beep (26000,200);
+			Beep (10000,200);
 
 			if(pointerLocation.Y == (ConsoleSize.Y/2)-2)
 			{
@@ -407,10 +370,10 @@ void render()
 
 	else
 	{
-
+	//Background
 	renderBack();	
 
-	//player render
+	//Player
     renderPlayer();
 
 	if (spawndummy == true)
@@ -453,7 +416,7 @@ void render()
 		writeToBuffer(c, "Good job! Wave 1 begins!" , 0x0A) ; 
 	} 
 
-	//enemy render
+	//Meteors
 	for ( int i = 0; i != currentWave; i++)
 	{
 		if ( spawnenemy[i] == 1 ) 
@@ -475,107 +438,34 @@ void render()
 		}
 	}
 
-	renderPink();
-
-	for ( int m = 0; m < 3; m++)
+	if (currentWave == 5)
 	{
-
-	for (int i = 0; i < 24; i++)
-	{
-		if (Mothership[m].createProj[i] == true)
-		{
-			writeToBuffer (Mothership[m].bossProjectile[i] , "Û±°", 0x09);
-		}
+		renderPink();
 	}
 
-	}
-	for ( int m = 0; m < 3; m++)
+	if (currentWave == 10)
 	{
-		if (Mothership[m].createBoss == false && deathFrame[m] >= 1 && deathFrame[m] < 30)
-		{
-			c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-			writeToBuffer (c, "\\--=-=ÛÛ", 0x0C); c.Y++; c.X+=2;
-			writeToBuffer (c, "/-°-||", 0x0C); c.Y++; c.X-=7;
-			writeToBuffer (c, "/===========<", 0x0C); c.Y++;
-			writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0C); c.Y++;
-			writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
-			writeToBuffer (c, "\\-°-||", 0x0C); c.Y++; c.X-=2;
-			writeToBuffer (c, "/--=-=ÛÛ", 0x0C); c.Y++;
-		}	
-
-		else if (Mothership[m].createBoss == true)
-		{
-			if (Mothership[m].health > 400)
-			{
-				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-				writeToBuffer (c, "\\--=-=ÛÛ", 0x0F); c.Y++; c.X+=2;
-				writeToBuffer (c, "/-°-||", 0x0F); c.Y++; c.X-=7;
-				writeToBuffer (c, "/===========<", 0x0F); c.Y++;
-				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0F); c.Y++;
-				writeToBuffer (c, "\\===========<", 0x0F); c.Y++; c.X+=7;
-				writeToBuffer (c, "\\-°-||", 0x0F); c.Y++; c.X-=2;
-				writeToBuffer (c, "/--=-=ÛÛ", 0x0F); c.Y++;
-			}
-
-			else if (Mothership[m].health > 300)
-			{
-				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-				writeToBuffer (c, "\\--=-=ÛÛ", 0x07); c.Y++; c.X+=2;
-				writeToBuffer (c, "/-°-||", 0x07); c.Y++; c.X-=7;
-				writeToBuffer (c, "/===========<", 0x07); c.Y++;
-				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x07); c.Y++;
-				writeToBuffer (c, "\\===========<", 0x07); c.Y++; c.X+=7;
-				writeToBuffer (c, "\\-°-||", 0x07); c.Y++; c.X-=2;
-				writeToBuffer (c, "/--=-=ÛÛ", 0x07); c.Y++;
-			}
-
-			else if (Mothership[m].health > 200)
-			{
-				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-				writeToBuffer (c, "\\--=-=ÛÛ", 0x08); c.Y++; c.X+=2;
-				writeToBuffer (c, "/-°-||", 0x08); c.Y++; c.X-=7;
-				writeToBuffer (c, "/===========<", 0x08); c.Y++;
-				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x08); c.Y++;
-				writeToBuffer (c, "\\===========<", 0x08); c.Y++; c.X+=7;
-				writeToBuffer (c, "\\-°-||", 0x08); c.Y++; c.X-=2;
-				writeToBuffer (c, "/--=-=ÛÛ", 0x08); c.Y++;
-			}
-
-			else if (Mothership[m].health > 100)
-			{
-				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-				writeToBuffer (c, "\\--=-=ÛÛ", 0x04); c.Y++; c.X+=2;
-				writeToBuffer (c, "/-°-||", 0x04); c.Y++; c.X-=7;
-				writeToBuffer (c, "/===========<", 0x04); c.Y++;
-				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x04); c.Y++;
-				writeToBuffer (c, "\\===========<", 0x04); c.Y++; c.X+=7;
-				writeToBuffer (c, "\\-°-||", 0x04); c.Y++; c.X-=2;
-				writeToBuffer (c, "/--=-=ÛÛ", 0x04); c.Y++;
-			}
-
-			else
-			{
-				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
-				writeToBuffer (c, "\\--=-=ÛÛ", 0x0C); c.Y++; c.X+=2;
-				writeToBuffer (c, "/-°-||", 0x0C); c.Y++; c.X-=7;
-				writeToBuffer (c, "/===========<", 0x0C); c.Y++;
-				writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0C); c.Y++;
-				writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
-				writeToBuffer (c, "\\-°-||", 0x0C); c.Y++; c.X-=2;
-				writeToBuffer (c, "/--=-=ÛÛ", 0x0C); c.Y++;
-			}	
-		}
+		renderMothership();
 	}
 
-	writeToBuffer (explosionLocation, "BOOM", 0x7C);
+	if (rand() % 2 == 0 )
+	{
+		writeToBuffer (explosionLocation, "BOOM", 0x47);
+		writeToBuffer (deathLocation, "BOOM", 0x47);
+	}
+
+	else
+	{
+		writeToBuffer (explosionLocation, "BOOM", 0x7C);
+		writeToBuffer (deathLocation, "BOOM", 0x7C);
+	}
+
 	explosionLocation.X = 0;
 	explosionLocation.Y = 0;
-
-	writeToBuffer (deathLocation, "BOOM", 0x7C);
 	deathLocation.X = 0;
 	deathLocation.Y = 0;
 
-	//renders the UI - hearts, wave number, etc.
+	//User Interface
 	renderUI();
 
 	}
@@ -642,7 +532,7 @@ void playerProjectile()
 		}
 	}
 
-	if (keyPressed[K_Z] && ultiBar == 50)
+	if (keyPressed[K_Z] && ultiBar >= 50)
     {
 		createUlti = 1;
 	}
@@ -764,78 +654,9 @@ void updateScore()
 	} 
 }
 
-void gameOver()
-{
-	clearBuffer(0x0F);
-
-	ifstream Read;
-	ifstream Read2;
-
-	string seethis;
-	string words;
-	string b; 
-
-	COORD c;
-	c.X = 0;
-	c.Y = 0;
-	writeToBuffer(c, "   ______                             ___                        ", 0x0A); c.Y++;
-	writeToBuffer(c, " .' ___  |                          .'   `.                      ", 0x0A); c.Y++;
-	writeToBuffer(c, "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  ", 0x0A); c.Y++;
-	writeToBuffer(c, "| |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] ", 0x0A); c.Y++;
-	writeToBuffer(c, "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    ", 0x0A); c.Y++;
-	writeToBuffer(c,"  `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  ", 0x0A); c.Y++;
-	
-	c.X = 8; c.Y = 10;
-	writeToBuffer ( c, "#1" , 0x0A);c.Y++;
-	writeToBuffer ( c, "#2" , 0x0A);c.Y++;
-	writeToBuffer ( c, "#3" , 0x0A);c.Y++;
-	writeToBuffer ( c, "#4" , 0x0A);c.Y++;
-	writeToBuffer ( c, "#5" , 0x0A);c.Y++;
-
-	Read.open ("highscores.txt" ) ;  
-	Read2.open ("highscorename.txt" ) ; 
-
-	if (Read.is_open() && Read2.is_open() )
-	{ 
-		for ( int z = 0 ; z < 5 ; z++ ) 
-		{
-			getline(Read2,b);
-			c.X = 11;
-			c.Y = 10 + z ;
-			seethis = b;
-			writeToBuffer ( c , seethis , 0x0A ) ;
-
-			getline(Read,words);
-			c.X = 18;
-			seethis = words  ; 
-			writeToBuffer ( c , seethis , 0x0A ) ;
-		}
-	}
-
-	Read.close();
-	Read2.close();
-	
-	char intscore[10];
-	c.Y+=2;
-	c.X=8;
-	writeToBuffer(c, "Your Final score is :",0x0A);
-	c.X=30;
-	writeToBuffer(c, itoa(score, intscore, 10), 0x0A);c.Y+=2;
-	c.X=8;
-	writeToBuffer(c, "Please enter your name : ", 0x0A); 
-	
-	flushBufferToConsole();
-			
-}
-
 void comet() 
 { 
-	if (delay == 1)
-	{
-		delay = 0;
-	}
-
-	else if (delay == 0)
+	if (delay == 0)
 	{
 		for ( int i = 0 ; i < 30 ; i++ ) 
 		{ 
@@ -860,7 +681,6 @@ void comet()
 			}
 		}
 
-		delay++;
 	}
 	
 } 

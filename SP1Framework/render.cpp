@@ -19,6 +19,7 @@ void renderMenu()
 	writeToBuffer ( c, "   /_/   \\_\\__|\\__\\__,_|\\\___|_|\\_\\  \\___/|_| |_| |____/| .__/ \\__,_|\\___\\___|", 0x0A); c.Y++;
 	writeToBuffer ( c, "                                                       | |                 ", 0x0A); c.Y++;
 	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
+
 	if (pointerLocation.Y == c.Y)
 	{
 		writeToBuffer ( c, "        Play", 0x0A); c.Y+=2;
@@ -185,25 +186,19 @@ void renderHighscore()
 void renderCredit()
 { 
 	//declarations
-	string credit;
+	string credit[17];
 	ifstream ReadCre;
 	//open txt file
 	ReadCre.open("credits.txt");
-
 	COORD c;
-	c.X=1;
-	c.Y=1;
-	writeToBuffer(c," Thank you for playing our game! We Hope you enjoyed it.",0x0A);c.Y+=2;
-	writeToBuffer(c," Credits go to : ", 0x0A);c.Y++;
+	c.X=20;
+	c.Y=3;
 
 	//read from txt file
-	while (!ReadCre.eof( ))
+	for (int i = 0; i < 17; i++)
 	{
-	if(ReadCre.is_open())
-		{
-			getline(ReadCre, credit);
-			writeToBuffer ( c, credit, 0x0A); c.Y++;
-		}
+		getline(ReadCre, credit[i]);
+		writeToBuffer ( c, credit[i], 0x0A); c.Y++;
 	}
 } 
 
@@ -243,10 +238,27 @@ void renderUI()
 
 	c.X = 25;
 	c.Y = 1;
+
 	for (int i = 0; i < ultiBar/10; i++)
 	{
-		writeToBuffer (c, char(4), 0x0B);
-		c.X+=2;
+		if ( i < 5)
+		{
+			writeToBuffer (c, char(4), 0x0B);
+			c.X+=2;
+		}
+
+		else if (i == 5)
+		{
+			c.X = 25;
+			writeToBuffer (c, char(4), 0x0F);
+			c.X+=2;
+		}
+		
+		else if (i > 5)
+		{
+			writeToBuffer (c, char(4), 0x0F);
+			c.X+=2;
+		}
 	}
 
 	for (int i = 0; i < 5 - ultiBar/10; i++)
@@ -270,7 +282,7 @@ void renderUI()
 		else
 		{
 			writeToBuffer ( c, "|", 0x0A); c.X++;
-			writeToBuffer ( c, "               Resume                   ", 0x02); c.X+=41;
+			writeToBuffer ( c, "               Resume                    ", 0x02); c.X+=41;
 			writeToBuffer ( c, "|", 0x0A); c.X = ConsoleSize.X - 60;  c.Y++; 
 		}
 		writeToBuffer ( c, "|                                         |", 0x0A); c.Y++;
@@ -315,7 +327,30 @@ void renderPlayer()
 		c.X = 17;
 		for ( int i = 17; i < ConsoleSize.X; i++)
 		{
-			writeToBuffer(c, "=", 0x0B);
+			if (delay == 1)
+			{
+				if (i%2 == 0)
+				{
+					writeToBuffer(c, "-", 0x0F);
+				}
+				else
+				{
+					writeToBuffer(c, "=", 0x0B);
+				}
+			}
+
+			else 
+			{
+				if (i%2 == 0)
+				{
+					writeToBuffer(c, "=", 0x0B);
+				}
+				else
+				{
+					writeToBuffer(c, "-", 0x0F);
+				}
+			}
+
 			c.X++;
 
 			if (Pink.shield == true && i == ConsoleSize.X - 18)
@@ -361,41 +396,16 @@ void renderBack()
 		c.X++;
 	}
 
-	if (currentWave == 5 || currentWave == 10 || currentWave == 15 || currentWave == 20)
+	if (waveDelay % 2 == 0)
 	{
-		if (waveDelay % 2 == 0)
-		{
-			renderWaveAlt(); 
-		}
-
-		else
-		{
-			renderWave();
-		}		
-
-		if (waveDelay <= 12)
-		{
-			waveDelay++;
-		}
+		renderWaveAlt(); 
 	}
 
-	else if (currentWave > 0)
+	else
 	{
-		if (waveDelay % 2 == 0)
-		{
-			renderWaveAlt(); 
-		}
+		renderWave();
+	}		
 
-		else
-		{
-			renderWave();
-		}		
-
-		if (waveDelay <= 8)
-		{
-			waveDelay++;
-		}
-	}
 
 	//background comets (fast and slow)
 	for ( int i = 0; i < 30 ; i++)
@@ -533,6 +543,102 @@ void renderPink()
 			{
 				writeToBuffer (Pink.bossProjectile[i] , "-", 0x0E);
 			}
+		}
+	}
+
+}
+
+void renderMothership()
+{
+	COORD c;
+
+	for ( int m = 0; m < 3; m++)
+	{
+		for (int i = 0; i < 24; i++)
+		{
+			if (Mothership[m].createProj[i] == true)
+			{
+				writeToBuffer (Mothership[m].bossProjectile[i] , "€±∞", 0x09);
+			}
+		
+		}
+	}
+
+	for ( int m = 0; m < 3; m++)
+	{
+		if (Mothership[m].createBoss == false && deathFrame[m] >= 1 && deathFrame[m] < 30)
+		{
+			c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+			writeToBuffer (c, "\\--=-=€€", 0x0C); c.Y++; c.X+=2;
+			writeToBuffer (c, "/-∞-||", 0x0C); c.Y++; c.X-=7;
+			writeToBuffer (c, "/===========<", 0x0C); c.Y++;
+			writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x0C); c.Y++;
+			writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
+			writeToBuffer (c, "\\-∞-||", 0x0C); c.Y++; c.X-=2;
+			writeToBuffer (c, "/--=-=€€", 0x0C); c.Y++;
+		}	
+
+		else if (Mothership[m].createBoss == true)
+		{
+			if (Mothership[m].health > 400)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x0F); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x0F); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x0F); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x0F); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x0F); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x0F); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x0F); c.Y++;
+			}
+
+			else if (Mothership[m].health > 300)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x07); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x07); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x07); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x07); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x07); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x07); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x07); c.Y++;
+			}
+
+			else if (Mothership[m].health > 200)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x08); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x08); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x08); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x08); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x08); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x08); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x08); c.Y++;
+			}
+
+			else if (Mothership[m].health > 100)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x04); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x04); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x04); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x04); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x04); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x04); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x04); c.Y++;
+			}
+
+			else
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x0C); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x0C); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x0C); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x0C); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x0C); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x0C); c.Y++;
+			}	
 		}
 	}
 
@@ -863,4 +969,63 @@ void renderWaveAlt()
 		writeToBuffer (c , " |__/|__/_/ |_|___/___/  /_/  /_/  " , 0x0C); c.Y++;
 	}
 
+}
+
+void gameOver()
+{
+	ifstream Read;
+	ifstream Read2;
+
+	string seethis;
+	string words;
+	string b; 
+
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	writeToBuffer(c, "   ______                             ___                        ", 0x0A); c.Y++;
+	writeToBuffer(c, " .' ___  |                          .'   `.                      ", 0x0A); c.Y++;
+	writeToBuffer(c, "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  ", 0x0A); c.Y++;
+	writeToBuffer(c, "| |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] ", 0x0A); c.Y++;
+	writeToBuffer(c, "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    ", 0x0A); c.Y++;
+	writeToBuffer(c,"  `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  ", 0x0A); c.Y++;
+	
+	c.X = 8; c.Y = 10;
+	writeToBuffer ( c, "#1" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#2" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#3" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#4" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#5" , 0x0A);c.Y++;
+
+	Read.open ("highscores.txt" ) ;  
+	Read2.open ("highscorename.txt" ) ; 
+
+	if (Read.is_open() && Read2.is_open() )
+	{ 
+		for ( int z = 0 ; z < 5 ; z++ ) 
+		{
+			getline(Read2,b);
+			c.X = 11;
+			c.Y = 10 + z ;
+			seethis = b;
+			writeToBuffer ( c , seethis , 0x0A ) ;
+
+			getline(Read,words);
+			c.X = 18;
+			seethis = words  ; 
+			writeToBuffer ( c , seethis , 0x0A ) ;
+		}
+	}
+
+	Read.close();
+	Read2.close();
+	
+	char intscore[10];
+	c.Y+=2;
+	c.X=8;
+	writeToBuffer(c, "Your Final score is :",0x0A);
+	c.X=30;
+	writeToBuffer(c, itoa(score, intscore, 10), 0x0A);c.Y+=2;
+	c.X=8;
+	writeToBuffer(c, "Please enter your name : ", 0x0A); 		
 }

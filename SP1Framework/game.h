@@ -67,6 +67,7 @@ void gameOver();
 void renderWave();
 void renderWaveAlt();
 void renderPink();
+void renderMothership();
 
 void renderMenu();
 void renderInstruction();

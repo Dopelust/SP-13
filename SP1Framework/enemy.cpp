@@ -103,6 +103,7 @@ void tutorial()
 
 void createEnemy()
 {
+	//Tutorial
 	if (currentWave == 0)
 	{
 		tutorial();
@@ -112,55 +113,63 @@ void createEnemy()
 	{
 		currentWave = 1;
 		tutdelay++;
+
+		if (tutdelay > 15)
+		{	
+			tutdelay = 0;
+			prompt[4] = false;
+		}
 	}
 
-	if (tutdelay > 15)
-	{	
-		tutdelay = 0;
-		prompt[4] = false;
-	}
-
-	//normal waves
+	//Waves
 	for ( int i = 0; i != currentWave; i++)
 	{
 		if (currentWave % 5 != 0)
 		{
-			enemy = rand() % (5*currentWave) + 1; //RNG
+			if (currentWave < 10)
+			{
+				enemy = rand() % (5*currentWave); //RNG
+			}
 
+			else
+			{
+				enemy = rand() % (11*currentWave); //RNG
+			}
+			
 			if ( enemy == 1 && spawnenemy[i] == 0 ) 
 			{ 
 				spawnenemy[i] = 1 ; 
-				enemyLocation[i].X = ConsoleSize.X - 3; //new spawn location
-				enemyLocation[i].Y = rand() % 20 + 3 ;
+				enemyLocation[i].X = ConsoleSize.X - 3; // Spawn Location
+				enemyLocation[i].Y = rand() % 20 + 3 ; 
 			} 
 		}
 
 		if (spawnenemy[i] == 1)
 		{
-			if (i%2 == 0 && currentWave > 5) //Red Meteor
+			if (i%2 == 0 && currentWave > 5) //Red Meteor (Appears Wave 5 and above)
 			{
 				enemyLocation[i].X--;
 			}
 
-			else if (currentWave > 10) //Unstable Meteor
+			else if (currentWave > 10) //Unstable Meteor (Appears Wave 10 and above)
 			{
 				enemyLocation[i].X--;
 
-				if (delay == 1)
+				for (int k = 0; k < 4; k++)
 				{
-					if (rand() % 8 == 1 && enemyLocation[i].Y < 20)
+					if (delay == 0 && rand() % 30 == 1 && enemyLocation[i].Y < 20 && missileLocation[k].Y != enemyLocation[i].Y + 1 && ultiLocation.Y != enemyLocation[i].Y + 1)
 					{
 						enemyLocation[i].Y++;
 					}
 
-					else if (rand() % 8 == 1 && enemyLocation[i].Y > 3)
+					else if (delay == 1 && rand() % 30 == 1 && enemyLocation[i].Y > 3 && ultiLocation.Y != enemyLocation[i].Y - 1)
 					{
 						enemyLocation[i].Y--;
 					}
 				}
 			}
 
-			else if (currentWave < 10 && delay == 1) //Blue Meteor
+			else if (currentWave < 10 && delay == 1) //Blue Meteor (Appears Waves 1 - 9)
 			{
 				enemyLocation[i].X--;
 			}
@@ -173,7 +182,7 @@ void createEnemy()
 		} 
 	}
 
-	for ( int i = 0; i != currentWave; i++) //Collision
+	for ( int i = 0; i != currentWave; i++) //Collision - After Movement
 	{
 		if (spawnenemy[i] == true)
 		{
@@ -182,7 +191,7 @@ void createEnemy()
 			if (collide == true || playerCollide == true)
 			{
 				deathLocation = enemyLocation[i]; //death animation
-				spawnenemy[i] = 0 ; 
+				spawnenemy[i] = 0; 
 
 				if (collide == true)
 				{
@@ -215,14 +224,35 @@ void collisions(COORD targetLocation)
 		
 		if (createMissile[j] == 1)
 		{
-			if ( (targetLocation.X <= missileLocation[j].X + 10 && targetLocation.Y == missileLocation[j].Y) ) //if collide
+			if ( targetLocation.X <= missileLocation[j].X + 10  && targetLocation.Y == missileLocation[j].Y && targetLocation.X + 8 >= missileLocation[j].X) //if collide
 			{ 
 				collide = true;
 				createMissile[j] = 0; //reset missile position
 
-				if (ultiBar < 50)
+				if (currentWave < 10)
 				{
-					ultiBar +=2; //charge up laser
+					if (ultiBar < 50)
+					{
+						ultiBar +=2; //charge up laser
+					}
+
+					if (ultiBar > 50)
+					{
+						ultiBar = 50;
+					}
+				}
+
+				else
+				{
+					if (ultiBar < 100)
+					{
+						ultiBar +=4; //charge up laser
+					}
+
+					if (ultiBar > 100)
+					{
+						ultiBar = 100;
+					}
 				}
 			}
 		} 
@@ -474,7 +504,7 @@ void Pink5()
 
 			if (Pink.bossLocation.X <= ConsoleSize.X - 15)
 			{
-				Pink.moveDown = true;
+				//Pink.moveDown = true;
 			}
 		}
 
@@ -553,7 +583,7 @@ void Pink5()
 			{	
 				if (Pink.shield == true)
 				{
-					if (( Pink.bossLocation.X - 8 <= missileLocation[i].X) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
+					if (( ConsoleSize.X - 23 <= missileLocation[i].X + 8) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
 					{
 						createMissile[i] = 0;
 						break;
@@ -562,9 +592,10 @@ void Pink5()
 
 				if (Pink.shield == false)
 				{
-					//Missile Collisions
-					if (( Pink.bossLocation.X  <= missileLocation[i].X) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
+					if (( Pink.bossLocation.X <= missileLocation[i].X + 8) && (Pink.bossLocation.Y + k == missileLocation[i].Y))
 					{
+						explosionLocation.X = Pink.bossLocation.X;
+						explosionLocation.Y = Pink.bossLocation.Y + k;
 						Pink.health -=10;
 						createMissile[i] = 0;
 						break;
