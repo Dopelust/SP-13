@@ -30,10 +30,10 @@ enum Keys
     K_UP,
     K_DOWN,
     K_ESCAPE,
-    K_COUNT,
 	K_SPACE,
-	K_X,
-	K_Z
+	K_ENTER,
+	K_Z,
+	K_COUNT
 };
 
 enum gameState
@@ -43,7 +43,8 @@ enum gameState
 	rule,
 	leaderboard,
 	credits,
-	pause
+	pause,
+	over
 };
 
 void init();                // initialize your variables, allocate memory, etc
@@ -53,10 +54,9 @@ void render();              // renders the current state of the game to the cons
 void shutdown();            // do clean up, free memory
 
 //update
-void missile();
-void ulti();
+void playerProjectile();
 void createEnemy();
-void collisions();
+void collisions(COORD targetLocation);
 void updateScore();
 
 //render
@@ -73,7 +73,6 @@ void renderInstruction();
 void renderHighscore();
 void renderCredit(); 
 
-void menuBgm();
 void tutorial();
 void Pink5();
 void Mothership10();
@@ -109,8 +108,9 @@ extern bool laserSight;
 extern bool fourMissiles;
 //Misc
 extern COORD deathLocation;
-extern COORD nullLocation;
+extern COORD explosionLocation;
 extern COORD pointerLocation;
+extern COORD nullLocation;
 extern bool delay;
 extern int waveDelay;
 extern int deathFrame[3];
@@ -120,5 +120,7 @@ extern void comet();
 extern int comets;
 extern COORD cometLocation[30]; 
 extern bool spawnComet[30];
-extern int musicFrame;
+extern bool collide;
+extern bool playerCollide;
+
 #endif // _GAME_H

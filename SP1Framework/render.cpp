@@ -21,55 +21,56 @@ void renderMenu()
 	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
 	if (pointerLocation.Y == c.Y)
 	{
-		writeToBuffer ( c, "        Play                                                        ", 0x0A); c.Y++;
+		writeToBuffer ( c, "        Play", 0x0A); c.Y+=2;
 	}
 	else
 	{
-		writeToBuffer ( c, "       Play                                                         ", 0x02); c.Y++;
+		writeToBuffer ( c, "       Play", 0x02); c.Y+=2;
 	}
-	writeToBuffer ( c, "                                                                              ", 0x0A); c.Y++;
 	if (pointerLocation.Y == c.Y)
 	{
-		writeToBuffer ( c, "        Instructions                                                ", 0x0A); c.Y++;
+		writeToBuffer ( c, "        Profile", 0x0A); c.Y+=2;
 	}
 	else
 	{
-		writeToBuffer ( c, "       Instructions                                                 ", 0x02); c.Y++;
+		writeToBuffer ( c, "       Profile", 0x02); c.Y+=2;
 	}
-		writeToBuffer ( c, "                                                                              ", 0x0A); c.Y++;
 	if (pointerLocation.Y == c.Y)
 	{
-		writeToBuffer ( c, "        Leaderboard                                                 ", 0x0A); c.Y++;
+		writeToBuffer ( c, "        Leaderboard", 0x0A); c.Y+=2;
 	}
 	else
 	{
-		writeToBuffer ( c, "       Leaderboard                                                  ", 0x02); c.Y++;
+		writeToBuffer ( c, "       Leaderboard", 0x02); c.Y+=2;
 	}
-	writeToBuffer ( c, "                                                                              ", 0x0A); c.Y++;
 	if (pointerLocation.Y == c.Y)
 	{
-		writeToBuffer ( c, "        Credits                                                     ", 0x0A); c.Y++;
+		writeToBuffer ( c, "        Credits", 0x0A); c.Y+=2;
 	}
 	else
 	{
-		writeToBuffer ( c, "       Credits                                                      ", 0x02); c.Y++;
+		writeToBuffer ( c, "       Credits", 0x02); c.Y+=2;
 	}
-	writeToBuffer ( c, "                                                                              ", 0x0A); c.Y++;
 	if (pointerLocation.Y == c.Y)
 	{
-		writeToBuffer ( c, "        Exit                                                         ", 0x0A); c.Y++;
+		writeToBuffer ( c, "        Exit", 0x0A); c.Y+=4;
 	}
 	else
 	{
-		writeToBuffer ( c, "       Exit                                                        ", 0x02); c.Y++;
+		writeToBuffer ( c, "       Exit", 0x02); c.Y+=4;
 	}
-	writeToBuffer ( c, "                                                                              ", 0x0A); c.Y+=3;
 	writeToBuffer ( c, "================================================================================", 0x0A); 
 	writeToBuffer ( pointerLocation , ">", 0x0A);
 }
 
 void renderInstruction()
 {
+	//declarations
+	string inst;
+	ifstream Reinst;
+	//open txt file
+	Reinst.open("instructions.txt");
+
 	COORD c;
 	c.X = 0;
 	c.Y = 0;
@@ -79,15 +80,47 @@ void renderInstruction()
 	writeToBuffer ( c, "  /\\/ /_ | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |" , 0x0A); c.Y++;
 	writeToBuffer ( c, "  \\____/ |_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|", 0x0A); c.Y++;
 	writeToBuffer ( c, "                                                         ", 0x0A); c.Y++;
-	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;
-	writeToBuffer ( c, "        1.Defend yourself from the aliens!", 0x0A);c.Y++;
-	writeToBuffer ( c, "        2.Press 'spacebar' to fire your missles!", 0x0A);c.Y++;
-	writeToBuffer ( c, "        3.Press 'z' to fire your laser!(Has cooldown and does not work on bosses)", 0x0A);c.Y++;
-	writeToBuffer ( c, "        4.After wave 4, there will be a boss battle", 0x0A);c.Y++;
-	writeToBuffer ( c, "        5.Have fun!!!", 0x0A);c.Y=18;
-	writeToBuffer ( c, "        Return to Menu" , 0x0A);c.Y=22;
+	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;	
+
+	//read from txt file
+	while (!Reinst.eof( ))
+	{
+		if(Reinst.is_open())
+		{
+			getline(Reinst, inst);
+			writeToBuffer ( c, inst, 0x0A); c.Y++;
+		}
+	}
+
+	c.X = 50;
+	c.Y = 14;
+	writeToBuffer(c, "      -\\_____________", 0x07 ); c.Y++;
+	writeToBuffer(c, "      |____________/_>", 0x07 ); c.Y++;
+	writeToBuffer(c, "     __/___--====_/", 0x07 ); c.Y+=2;
+	writeToBuffer(c, "Pacifista Model 07 / PX-07", 0x0A ); 
+
+	c.X = 0;
+	c.Y=16;
+	if (pointerLocation.Y == 16)
+	{
+		writeToBuffer ( c, "        Report" , 0x0A); c.Y+=2;
+	}
+	else
+	{
+		writeToBuffer ( c, "       Report" , 0x02); c.Y+=2;
+	}
+	if (pointerLocation.Y == 18)
+	{
+		writeToBuffer ( c, "        Return to Menu" , 0x0A);
+	}
+	else
+	{
+		writeToBuffer ( c, "       Return to Menu" , 0x02);
+	}
+	c.Y=22;
 	writeToBuffer ( c, "================================================================================", 0x0A);
 	writeToBuffer ( pointerLocation , ">", 0x0A);
+	
 }
 
 void renderHighscore()
@@ -151,31 +184,27 @@ void renderHighscore()
 
 void renderCredit()
 { 
+	//declarations
+	string credit;
+	ifstream ReadCre;
+	//open txt file
+	ReadCre.open("credits.txt");
+
 	COORD c;
 	c.X=1;
 	c.Y=1;
 	writeToBuffer(c," Thank you for playing our game! We Hope you enjoyed it.",0x0A);c.Y+=2;
 	writeToBuffer(c," Credits go to : ", 0x0A);c.Y++;
-	writeToBuffer(c,"__________.__                                   ", 0x0A);c.Y++;
-	writeToBuffer(c,"\\______   \\__| ____   ______ __________   ____  ", 0x0A);c.Y++;
-	writeToBuffer(c," |       _/  |/ ___\\ /  ___//  ___/  _ \\ /    \\ ", 0x0A);c.Y++;
-	writeToBuffer(c," |    |   \\  \\  \\___ \\___ \\ \\___ (  <_> )   |  \\ ", 0x0A);c.Y++;
-	writeToBuffer(c," |____|_  /__|\\___  >____  >____  >____/|___|  /", 0x0A);c.Y++;
-	writeToBuffer(c,"   _____              .___      ", 0x0A);c.Y++;
-	writeToBuffer(c,"  /  _  \\   ____    __| _/__.__.", 0x0A);c.Y++;
-	writeToBuffer(c," /  /_\\  \\ /    \\  / __ <   |  |", 0x0A);c.Y++;
-	writeToBuffer(c,"/    |    \\   |  \\/ /_/ |\\___  |", 0x0A);c.Y++;
-	writeToBuffer(c,"\\____|__  /___|  /\\____ |/ ____|", 0x0A);c.Y++;
-	writeToBuffer(c,"     ____.              _________             ", 0x0A);c.Y++;
-	writeToBuffer(c,"    |    |__ __  ____  /   _____/ ____   ____  ", 0x0A);c.Y++;
-	writeToBuffer(c,"    |    |  |  \\/    \\ \\_____  \\_/ __ \\ /    \\ ", 0x0A);c.Y++;
-	writeToBuffer(c,"/\\__|    |  |  /   |  \\/        \\  ___/|   |  \\", 0x0A);c.Y++;
-	writeToBuffer(c,"\\________|____/|___|  /_______  /\\___  >___|  /", 0x0A);c.Y++;
-	writeToBuffer(c,".____       _____  __________  _____ __________ ____ ___  _________", 0x0A);c.Y++;
-	writeToBuffer(c,"|    |     /  _  \\ \\____    / /  _  \\\\______   \\    |   \\/   _____/", 0x0A);c.Y++;
-	writeToBuffer(c,"|    |    /  /_\\  \\  /     / /  /_\\  \\|       _/    |   /\\_____  \\ ", 0x0A);c.Y++;
-	writeToBuffer(c,"|    |___/    |    \\/     /_/    |    \\    |   \\    |  / /        \\", 0x0A);c.Y++;
-	writeToBuffer(c,"|_______ \\____|__  /_______ \\____|__  /____|_  /______/ /_______  /", 0x0A);c.Y++;
+
+	//read from txt file
+	while (!ReadCre.eof( ))
+	{
+	if(ReadCre.is_open())
+		{
+			getline(ReadCre, credit);
+			writeToBuffer ( c, credit, 0x0A); c.Y++;
+		}
+	}
 } 
 
 void renderUI()
@@ -278,9 +307,9 @@ void renderPlayer()
 	COORD c;
 	c.X = charLocation.X;
 	c.Y = charLocation.Y;
-	writeToBuffer(c, "  /---\\_________", 0x07 );
+	writeToBuffer(c, " -\\_____________", 0x07 );
 	c.Y++;
-	writeToBuffer(c, " |____________|_|", 0x07 );
+	writeToBuffer(c, " |____________/_>", 0x07 );
 	if (createUlti == true)
 	{
 		c.X = 17;
@@ -307,9 +336,7 @@ void renderPlayer()
 		c.X = charLocation.X;
 	}
 	c.Y++;
-	writeToBuffer(c, "  /===========\\", 0x07 );
-	c.Y++;
-	writeToBuffer(c, "  \\_@_@_@_@_@_/", 0x07 );
+	writeToBuffer(c, "__/___--====_/", 0x07 );
 
 	if (fourMissiles == 1)
 	{
@@ -378,8 +405,6 @@ void renderBack()
 			writeToBuffer (cometLocation[i], "." , 0x0F);
 		}
 	}
-
-	
 }
 
 void renderPink()

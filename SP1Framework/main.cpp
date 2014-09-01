@@ -40,25 +40,5 @@ void mainLoop()
         update(g_timer.getElapsedTime());   // update the game
         render();                           // render the graphics output to screen
         g_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.      
-
-		if ( heart <= 0)
-		{
-			gameOver();
-			cin >> names;
-
-			while ( names.length() > 7 ) 
-			{ 
-				clearBuffer(0x0F);
-				COORD c ; 
-				c.X = 0 ; 
-				c.Y = 10; 
-				writeToBuffer( c, " Only names less than 7 characters " , 0x0A ) ; 
-				cin >> names ; 
-				flushBufferToConsole();
-			} 
-
-			updateScore();
-			g_quitGame= true;
-		}
 	}    
 }

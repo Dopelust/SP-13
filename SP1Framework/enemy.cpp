@@ -7,6 +7,7 @@ int dummy = 0 ;
 int tutdelay = 0;
 
 int wait = 0;
+int counter = 0;
 
 void tutorial()
 {
@@ -124,24 +125,45 @@ void createEnemy()
 	{
 		if (currentWave % 5 != 0)
 		{
-			enemy = rand() % (5*currentWave) + 1;
+			enemy = rand() % (5*currentWave) + 1; //RNG
 
 			if ( enemy == 1 && spawnenemy[i] == 0 ) 
 			{ 
 				spawnenemy[i] = 1 ; 
-				enemyLocation[i].X = ConsoleSize.X - 5; //new spawn location
+				enemyLocation[i].X = ConsoleSize.X - 3; //new spawn location
 				enemyLocation[i].Y = rand() % 20 + 3 ;
 			} 
 		}
 
-		if (i%2 == 0 && currentWave > 5)
+		if (spawnenemy[i] == 1)
 		{
-			enemyLocation[i].X--;
-		}
+			if (i%2 == 0 && currentWave > 5) //Red Meteor
+			{
+				enemyLocation[i].X--;
+			}
 
-		else if (spawnenemy[i] == 1 && delay == 1)
-		{
-			enemyLocation[i].X--;
+			else if (currentWave > 10) //Unstable Meteor
+			{
+				enemyLocation[i].X--;
+
+				if (delay == 1)
+				{
+					if (rand() % 8 == 1 && enemyLocation[i].Y < 20)
+					{
+						enemyLocation[i].Y++;
+					}
+
+					else if (rand() % 8 == 1 && enemyLocation[i].Y > 3)
+					{
+						enemyLocation[i].Y--;
+					}
+				}
+			}
+
+			else if (currentWave < 10 && delay == 1) //Blue Meteor
+			{
+				enemyLocation[i].X--;
+			}
 		}
 
 		if ( spawnenemy[i] != 1 ) 
@@ -151,76 +173,91 @@ void createEnemy()
 		} 
 	}
 
+	for ( int i = 0; i != currentWave; i++) //Collision
+	{
+		if (spawnenemy[i] == true)
+		{
+			collisions(enemyLocation[i]);
+
+			if (collide == true || playerCollide == true)
+			{
+				deathLocation = enemyLocation[i]; //death animation
+				spawnenemy[i] = 0 ; 
+
+				if (collide == true)
+				{
+					score++;
+				}
+
+				if (playerCollide == true)
+				{
+					heart--;
+				}		
+
+				collide = false;
+				playerCollide = false;
+			}
+
+		}
+	}
+
 }
 
-void collisions()
+void collisions(COORD targetLocation)
 {	
-	//Enemy Collisions
-	for ( int i = 0; i != currentWave; i++)
+	//With Missiles
+	for (int j = 0; j < 4; j++)
 	{
-		//With Missiles
-		for (int j = 0; j < 4; j++)
+		if (fourMissiles == false && j == 2)
 		{
-			if (fourMissiles == false && j == 2)
-			{
-				break;
-			}
-
+			break;
+		}
 		
-		if ( (enemyLocation[i].X <= missileLocation[j].X && enemyLocation[i].Y == missileLocation[j].Y) ) //if collide
-		{ 
-			spawnenemy[i] = 0 ; 
-			deathLocation = enemyLocation[i]; //death animation
-			score ++; //score increase
+		if (createMissile[j] == 1)
+		{
+			if ( (targetLocation.X <= missileLocation[j].X + 10 && targetLocation.Y == missileLocation[j].Y) ) //if collide
+			{ 
+				collide = true;
+				createMissile[j] = 0; //reset missile position
 
-			createMissile[j] = 0; //reset missile position
-
-			if (ultiBar < 50)
-			{
-				ultiBar +=2; //charge up laser
+				if (ultiBar < 50)
+				{
+					ultiBar +=2; //charge up laser
+				}
 			}
 		} 
+	}
 
-		}
+	//With Ulti
+	if (targetLocation.Y == ultiLocation.Y) 
+	{ 
+		collide = true;
+	}
 
-		//With Ulti
-		if (enemyLocation[i].Y == ultiLocation.Y) 
+	if (targetLocation.X < 1 )
+	{
+		playerCollide = true;
+	}
+
+	//With Player
+	else if (targetLocation.X < 16 ) //x dimension of player hitbox
+	{
+		for ( int k = 0 ; k < 4 ; k++ ) //y dimension of player hitbox
 		{ 
-			spawnenemy[i] = 0 ;
-			score ++; 
-		} 
-
-		if (enemyLocation[i].X < 1 )
-		{
-			deathLocation = enemyLocation[i];
-			spawnenemy[i] = 0 ;
-			heart--; 
-		}
-
-		//With Player
-		else if (enemyLocation[i].X < 16 ) //x dimension of player hitbox
-		{
-			for ( int k = 0 ; k < 4 ; k++ ) //y dimension of player hitbox
+			if ( targetLocation.X >= charLocation.X  && targetLocation.Y == charLocation.Y + k ) //if collide
 			{ 
-				if ( enemyLocation[i].X >= charLocation.X  && enemyLocation[i].Y == charLocation.Y + k ) //if collide
-				{ 
-					deathLocation = enemyLocation[i];
-					spawnenemy[i] = 0 ;
-					enemyLocation[i].X = ConsoleSize.X - 5; //new spawn location
-					enemyLocation[i].Y = rand() % 20 + 3 ;
-					heart--; //heart decrease
-					break;
-				} 
+				playerCollide = true;
+				break;
 			} 
-		}
+		} 
 	}
 }
 
 void Mothership10()
 {
-	wait ++;
+	wait ++; //Spawn projectiles delay
 
-	if (wait > 21)
+	if (wait > 18)
 	{
 		wait = 0;
 	}
@@ -255,7 +292,7 @@ void Mothership10()
 		Mothership[m].createBoss = 1;
 	}
 
-	if (Mothership[m].createBoss == 0 && deathFrame[m] > 0)
+	if (Mothership[m].createBoss == 0 && deathFrame[m] > 0) //Death Animation
 	{
 		deathFrame[m]++;	
 
@@ -273,67 +310,37 @@ void Mothership10()
 		}
 	}
 
-	if (deathFrame[m] > 100)
+	if (deathFrame[m] > 60) //End Death Animation
 	{
-		deathFrame[m] = 0;
 		score +=11;
+		deathFrame[m] = -1;
 	}
 
-	for (int i = 0; i < 5; i++)
+	if (deathFrame[m] == -1) //Terminate Death Animation
 	{
-		if (Mothership[m].createProj[i] == true && delay == 1)
+		if (Mothership[m].createProj[0] == false && Mothership[m].createProj[1] == false && Mothership[m].createProj[2] == false && Mothership[m].createProj[3] == false && Mothership[m].createProj[4] == false && Mothership[m].createProj[5] == false)
 		{
-			Mothership[m].bossProjectile[i].X--;
+			counter++;
+			deathFrame[m] = 0;
 		}
 
-		if (Mothership[m].bossProjectile[i].X == 0)
+		if (counter == 3)
 		{
-			Mothership[m].createProj[i] = false;
-		}
-
-		for ( int k = 0; k < 4; k++)
-		{
-			if (fourMissiles == false && k == 2)
-			{
-				break;
-			}
-			if (Mothership[m].createProj[i] == true && missileLocation[k].X >= Mothership[m].bossProjectile[i].X && missileLocation[k].Y == Mothership[m].bossProjectile[i].Y)
-			{
-				deathLocation = Mothership[m].bossProjectile[i];
-				createMissile[k] = false;
-				Mothership[m].createProj[i] = false;
-				break;
-			}
+			waveDelay = 0;
+			currentWave++;
 		}
 	}
-	//Codename Pink's AI
-	if (Mothership[m].createBoss == 1 )
+
+	if (Mothership[m].createBoss == 1) //If alive
 	{
 		// Death condition
 		if (Mothership[m].health <= 0)
-		{
+		{	
 			deathFrame[m]++;
 			Mothership[m].createBoss = 0;
 		}
 
-		for (int i = 0; i < 5; i++)
-		{				
-			if (Mothership[m].createProj[i] == false && wait == 21 && Mothership[m].createProj[4] == false)
-			{
-				Mothership[m].createProj[i] = true;
-				Mothership[m].bossProjectile[i].X = Mothership[m].bossLocation.X;
-				Mothership[m].bossProjectile[i].Y = Mothership[m].bossLocation.Y + 1;
-				break;
-			}
-
-			else if (Mothership[m].createProj[i] == false ) 
-			{ 
-				Mothership[m].bossProjectile[i].X = 1 ;
-				Mothership[m].bossProjectile[i].Y = 1 ;
-			} 
-		}
-
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) //Collision with Mothership
 		{
 			if (fourMissiles == false && i == 2)
 			{
@@ -342,42 +349,71 @@ void Mothership10()
 
 			for ( int k = -2 ; k < 5 ; k++ )
 			{	
-				if (ultiLocation.Y == Mothership[m].bossLocation.Y + k)
+				if (ultiLocation.Y == Mothership[m].bossLocation.Y + k) //Ulti Damage
 				{
-					Mothership[m].health -=5;
+					explosionLocation.X = Mothership[m].bossLocation.X + 1;
+					explosionLocation.Y = Mothership[m].bossLocation.Y + k;
+					Mothership[m].health --;
 				}
 			}
 
 			for ( int k = -2 ; k < 5 ; k++ )
 			{	
-				if (missileLocation[i].X >= Mothership[m].bossLocation.X && missileLocation[i].Y == Mothership[m].bossLocation.Y + k)
+				if (missileLocation[i].X + 6 >= Mothership[m].bossLocation.X && missileLocation[i].Y == Mothership[m].bossLocation.Y + k) //Missile Damage
 				{
-					Mothership[m].health -=100;
+					explosionLocation.X = Mothership[m].bossLocation.X + 1;
+					explosionLocation.Y = Mothership[m].bossLocation.Y + k;
+					Mothership[m].health -=5;
 					createMissile[i] = 0;
 					break;
 				}
 			}
 		}
-	
-		//Player's Hitbox
-		for ( int j = 0 ; j < 17 ; j++ ) 
+	}
+
+	//Projectiles
+	for (int i = 0; i < 6; i++) //Projectiles - Initialization
+	{				
+		if (Mothership[m].createBoss == true && Mothership[m].createProj[i] == false && wait == 18 && Mothership[m].createProj[5] == false) //Initializing Projectiles
+		{
+			Mothership[m].createProj[i] = true;
+			Mothership[m].bossProjectile[i].X = Mothership[m].bossLocation.X;
+			Mothership[m].bossProjectile[i].Y = Mothership[m].bossLocation.Y + 1;
+			break;
+		}
+
+		else if (Mothership[m].createProj[i] == false ) 
 		{ 
-			for ( int k = 0 ; k < 4 ; k++ ) 
-			{ 
-				for (int i = 0; i <= Pink.index; i++)
-				{
-					if (Pink.bossProjectile[i].X == charLocation.X + j && Pink.bossProjectile[i].Y == charLocation.Y + k )
-					{	
-						Pink.createProj[i] = false;
-						Pink.bossProjectile[i] = nullLocation;
-						heart--;
-					}
-				}
-			} 
+			Mothership[m].bossProjectile[i].X = 1 ;
+			Mothership[m].bossProjectile[i].Y = 1 ;
 		} 
 	}
 
+	for (int i = 0; i < 6; i++) //Projectiles - Movement, Collisions
+	{
+		if (Mothership[m].createProj[i] == true && delay == 1)
+		{
+			Mothership[m].bossProjectile[i].X--;
+		}
+
+		collisions (Mothership[m].bossProjectile[i]);
+
+		if (collide == true || playerCollide == true)
+		{
+			Mothership[m].createProj[i] = false;
+			deathLocation = Mothership[m].bossProjectile[i]; //death animation
+
+			if (playerCollide == true)
+			{
+				heart--;
+			}
+
+			collide = false;
+			playerCollide = false;
+		}
 	}
+}
+
 }
 
 void Pink5()

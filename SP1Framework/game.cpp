@@ -5,7 +5,7 @@
 
 bool keyPressed[K_COUNT];
 
-gameState state = play;
+gameState state = menu;
 
 //Requisite
 COORD ConsoleSize = {80,25};
@@ -25,7 +25,7 @@ int ultiBar = 50;
 COORD charLocation;
 COORD ultiLocation;
 //Enemy
-int currentWave = 0;
+int currentWave = 10;
 bool spawnenemy[20]; 
 COORD enemyLocation[20];
 //Tutorial
@@ -42,6 +42,7 @@ bool delay = 0; //for blue asteroids and stars
 int waveDelay = 0; //blinks the Wave
 int deathFrame[3]; //boss death animation
 int spawnFrame = 0; //boss spawn animation
+COORD explosionLocation;
 COORD deathLocation;
 COORD nullLocation;
 COORD pointerLocation;
@@ -49,19 +50,20 @@ COORD pointerLocation;
 void comet(); 
 COORD cometLocation[30]; 
 bool spawnComet[30];
-int musicFrame = 0;
+bool collide = 0;
+bool playerCollide = 0;
 
 void init()
 {
-	heart = 9 ; 
+	heart = 5 ; 
 	score = 45 ; 
 	ultiBar = 50; 
-	currentWave = 5 ; 
+	currentWave = 5; 
 	enemyLocation[0].X = ConsoleSize.X - 5;
 	createMissile[0] = 0 ; 
 	createMissile[1] = 0 ;
-	laserSight = 0 ; 
-	fourMissiles = 0 ; 
+	laserSight = 1 ; 
+	fourMissiles = 1 ; 
 	createUlti = 0 ;
 
     //time
@@ -107,7 +109,7 @@ void getInput()
     keyPressed[K_DOWN] = isKeyPressed(VK_DOWN);
     keyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
     keyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
-	keyPressed[K_X] = isKeyPressed(0x58);
+	keyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
 	keyPressed[K_Z] = isKeyPressed(0x5A);
 }
 
@@ -159,12 +161,11 @@ void update(double dt)
 			 charLocation.Y++;
 			 promptCondition[0] = true;
 		}
-	
-		missile();
-		ulti();
 
+		playerProjectile();
 		createEnemy();
-		collisions();
+
+		//playerProjectile();
 
 		if (currentWave == 5)
 		{
@@ -175,30 +176,65 @@ void update(double dt)
 		{
 			Mothership10();
 		}
+
+		if ( heart <= 0 )
+		{
+			state = over;
+		}
+	}
+
+	else if (state == over)
+	{
+		//updateScore();
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
+		{
+			Beep (26000,200);
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 10; 
+		}	
 	}
 
 	else if (state == menu)
 	{
-		menuBgm();
-
-		if (keyPressed[K_UP] && pointerLocation.Y != 10)
+		if (keyPressed[K_UP])
 		{
 			pointerLocation.Y-=2; 
-			Beep (3000,100);
+			Beep (1500,200);
+
+			if (pointerLocation.Y == 8)
+			{
+				pointerLocation.Y = 18;
+			}
 		}
 
-		if (keyPressed[K_DOWN] && pointerLocation.Y != 18)
+		if (keyPressed[K_DOWN])
 		{
 			pointerLocation.Y+=2; 
-			Beep (3000,100);
+			Beep (1500,200);
+
+			if (pointerLocation.Y == 20)
+			{
+				pointerLocation.Y = 10;
+			}
 		}
 
-		if (keyPressed[K_X])
+		if (keyPressed[K_ESCAPE])
 		{
+			Sleep(150);
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 18; 
+
+		}
+
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
+		{
+			Beep (26000,200);
+
 			if (pointerLocation.Y == 10) //Play
 			{
 				init(); 
-				musicFrame = 0;
 				state = play;
 			}
 			else if (pointerLocation.Y == 12) //Instructions
@@ -226,37 +262,75 @@ void update(double dt)
 	
 	else if (state == rule)
 	{
-		menuBgm();
-
-		if (keyPressed[K_X])
+		if (keyPressed[K_ESCAPE])
 		{
+			Sleep(150);
 			state = menu;
 			pointerLocation.X = 6; 
-			pointerLocation.Y = 10; 
+			pointerLocation.Y = 12; 
+		}
+
+		if (keyPressed[K_UP])
+		{
+			pointerLocation.Y-=2; 
+			Beep (1500,200);
+
+			if (pointerLocation.Y == 14)
+			{
+				pointerLocation.Y = 18;
+			}
+		}
+
+		if (keyPressed[K_DOWN])
+		{
+			pointerLocation.Y+=2; 
+			Beep (1500,200);
+
+			if (pointerLocation.Y == 20)
+			{
+				pointerLocation.Y = 16;
+			}
+		}
+
+		if (pointerLocation.Y == 18)
+		{
+			if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
+			{
+				Beep (26000,200);
+				state = menu;
+				pointerLocation.X = 6; 
+				pointerLocation.Y = 12; 
+			}	
 		}
 	}
 
 	else if (state == leaderboard)
 	{
-		menuBgm();
-
-		if (keyPressed[K_X])
+		if (keyPressed[K_ESCAPE])
 		{
+			Sleep(150);
 			state = menu;
 			pointerLocation.X = 6; 
-			pointerLocation.Y = 10; 
+			pointerLocation.Y = 14; 
+		}
+
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
+		{
+			Beep (26000,200);
+			state = menu;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 14; 
 		}
 	}
 
 	else if (state == credits)
 	{
-		menuBgm();
-
 		if (keyPressed[K_ESCAPE])
 		{
+			Sleep(150);
 			state = menu;
 			pointerLocation.X = 6; 
-			pointerLocation.Y = 10; 
+			pointerLocation.Y = 16; 
 		}
 	}
 
@@ -265,17 +339,19 @@ void update(double dt)
 		if (keyPressed[K_UP] && pointerLocation.Y != (ConsoleSize.Y / 2) - 2)
 		{
 			pointerLocation.Y-=2; 
-			Beep (3000,100);
+			Beep (1500,200);
 		}
 
 		if (keyPressed[K_DOWN] && pointerLocation.Y != (ConsoleSize.Y / 2) + 2)
 		{
 			pointerLocation.Y+=2; 
-			Beep (3000,100);
+			Beep (1500,200);
 		}
 
-		if (keyPressed[K_X])
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
 		{
+			Beep (26000,200);
+
 			if(pointerLocation.Y == (ConsoleSize.Y/2)-2)
 			{
 				state = play;
@@ -322,6 +398,11 @@ void render()
 	else if (state == credits)
 	{
 		renderCredit();
+	}
+
+	else if (state == over)
+	{
+		gameOver();
 	}
 
 	else
@@ -382,6 +463,11 @@ void render()
 				writeToBuffer (enemyLocation[i], "Û±°", 0x0C);
 			}
 
+			else if (currentWave > 10)
+			{
+				writeToBuffer (enemyLocation[i], "Û±°", 0x0E);
+			}
+
 			else
 			{
 				writeToBuffer (enemyLocation[i], "Û±°", 0x09);
@@ -405,7 +491,19 @@ void render()
 	}
 	for ( int m = 0; m < 3; m++)
 	{
-		if (Mothership[m].createBoss == true)
+		if (Mothership[m].createBoss == false && deathFrame[m] >= 1 && deathFrame[m] < 30)
+		{
+			c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+			writeToBuffer (c, "\\--=-=ÛÛ", 0x0C); c.Y++; c.X+=2;
+			writeToBuffer (c, "/-°-||", 0x0C); c.Y++; c.X-=7;
+			writeToBuffer (c, "/===========<", 0x0C); c.Y++;
+			writeToBuffer (c, "|ÛÛÛÛÛ±±±±°°°", 0x0C); c.Y++;
+			writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
+			writeToBuffer (c, "\\-°-||", 0x0C); c.Y++; c.X-=2;
+			writeToBuffer (c, "/--=-=ÛÛ", 0x0C); c.Y++;
+		}	
+
+		else if (Mothership[m].createBoss == true)
 		{
 			if (Mothership[m].health > 400)
 			{
@@ -455,7 +553,7 @@ void render()
 				writeToBuffer (c, "/--=-=ÛÛ", 0x04); c.Y++;
 			}
 
-			else if (Mothership[m].health > 0)
+			else
 			{
 				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
 				writeToBuffer (c, "\\--=-=ÛÛ", 0x0C); c.Y++; c.X+=2;
@@ -465,13 +563,18 @@ void render()
 				writeToBuffer (c, "\\===========<", 0x0C); c.Y++; c.X+=7;
 				writeToBuffer (c, "\\-°-||", 0x0C); c.Y++; c.X-=2;
 				writeToBuffer (c, "/--=-=ÛÛ", 0x0C); c.Y++;
-			}
+			}	
 		}
 	}
 
+	writeToBuffer (explosionLocation, "BOOM", 0x7C);
+	explosionLocation.X = 0;
+	explosionLocation.Y = 0;
+
 	writeToBuffer (deathLocation, "BOOM", 0x7C);
-	deathLocation = nullLocation;
-	
+	deathLocation.X = 0;
+	deathLocation.Y = 0;
+
 	//renders the UI - hearts, wave number, etc.
 	renderUI();
 
@@ -480,7 +583,7 @@ void render()
 	flushBufferToConsole();
 }
 
-void missile()
+void playerProjectile()
 {
 	//calls missile creation when space is pressed
 
@@ -538,10 +641,7 @@ void missile()
 			createMissile[3] = 1;
 		}
 	}
-}
 
-void ulti()
-{
 	if (keyPressed[K_Z] && ultiBar == 50)
     {
 		createUlti = 1;
@@ -668,6 +768,13 @@ void gameOver()
 {
 	clearBuffer(0x0F);
 
+	ifstream Read;
+	ifstream Read2;
+
+	string seethis;
+	string words;
+	string b; 
+
 	COORD c;
 	c.X = 0;
 	c.Y = 0;
@@ -677,8 +784,46 @@ void gameOver()
 	writeToBuffer(c, "| |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] ", 0x0A); c.Y++;
 	writeToBuffer(c, "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    ", 0x0A); c.Y++;
 	writeToBuffer(c,"  `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  ", 0x0A); c.Y++;
-	writeToBuffer(c, " Please enter your name : ", 0x0A); 
+	
+	c.X = 8; c.Y = 10;
+	writeToBuffer ( c, "#1" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#2" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#3" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#4" , 0x0A);c.Y++;
+	writeToBuffer ( c, "#5" , 0x0A);c.Y++;
 
+	Read.open ("highscores.txt" ) ;  
+	Read2.open ("highscorename.txt" ) ; 
+
+	if (Read.is_open() && Read2.is_open() )
+	{ 
+		for ( int z = 0 ; z < 5 ; z++ ) 
+		{
+			getline(Read2,b);
+			c.X = 11;
+			c.Y = 10 + z ;
+			seethis = b;
+			writeToBuffer ( c , seethis , 0x0A ) ;
+
+			getline(Read,words);
+			c.X = 18;
+			seethis = words  ; 
+			writeToBuffer ( c , seethis , 0x0A ) ;
+		}
+	}
+
+	Read.close();
+	Read2.close();
+	
+	char intscore[10];
+	c.Y+=2;
+	c.X=8;
+	writeToBuffer(c, "Your Final score is :",0x0A);
+	c.X=30;
+	writeToBuffer(c, itoa(score, intscore, 10), 0x0A);c.Y+=2;
+	c.X=8;
+	writeToBuffer(c, "Please enter your name : ", 0x0A); 
+	
 	flushBufferToConsole();
 			
 }
@@ -719,53 +864,3 @@ void comet()
 	}
 	
 } 
-
-void menuBgm()
-{
-	switch (musicFrame)
-	{
-	case 0 : Beep (277,200); break;
-	case 1 : Beep (277,200); break;
-	case 2 : Beep (329,200); break;
-	case 3 : Beep (311,400); break;
-	case 4 : Beep (246,200); break;
-	case 5 : Beep (277,500); break;
-	case 6 : Beep (277,200); break;
-	case 7 : Beep (329,200); break;  
-	case 8 : Beep (311,400); break; 
-	case 9: Beep (246,200); Sleep(400); break;
-	case 10 : Beep (415,300); break;
-	case 11 : Beep (329,300); break; 
-	case 12: Beep (369,300); break;
-	case 13: Beep (311,300); break; 
-	case 14: Beep (329,300); break;
-	case 15: Beep (277,300); break; 
-	case 16: Beep (311,400); break; 
-	case 17: Beep (246,300); Sleep(200); break; 
-	case 18: Beep (415,300);  break; 
-	case 19: Beep (329,300);  break; 
-	case 20: Beep (369,300); break; 
-	case 21: Beep (311,300); break; 
-	case 22: Beep (329,300); break; 
-	case 23: Beep (311,300); break; 
-	case 24: Beep (277,300); break; 
-	case 25: Beep (246,300); Sleep (200); break; 
-	case 26: Beep (493,300); break; 
-	case 27: Beep (392,300); break; 
-	case 28: Beep (440,300);  break; 
-	case 29: Beep (369,300); break; 
-	case 30: Beep (392,300); break; 
-	case 31: Beep (329,300); break; 
-	case 32: Beep (369,300);  break; 
-	case 33: Beep (293,300); Sleep (200); break; 
-	case 34: Beep (493,300); Sleep (100);  break; 
-	case 35: Beep (392,300);  Sleep (100); break; 
-	case 36: Beep (440,300);  break; 
-	case 37: Beep (369,300); break; 
-	case 38: Beep (392,300); break; 
-	case 39: Beep (369,300); break; 
-	case 40: Beep (329,300); break; 
-	case 41: Beep (311,300); Sleep(200); musicFrame = 9; break; 
-	}
-	musicFrame++;
-}
