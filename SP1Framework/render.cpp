@@ -3,7 +3,11 @@
 #include <iostream>
 #include <iomanip>
 
+extern bool keyPressed[K_COUNT];
 extern COORD ConsoleSize;
+string save[5];
+bool shift = 0;
+string input;
 
 void renderMenu()
 {
@@ -75,11 +79,11 @@ void renderInstruction()
 	COORD c;
 	c.X = 0;
 	c.Y = 0;
-	writeToBuffer ( c, "    _____           _                   _   _             ", 0x0A); c.Y++;
-	writeToBuffer ( c, "    \\_   \\_ __  ___| |_ _ __ _   _  ___| |_(_) ___  _ __  ", 0x0A); c.Y++;
-	writeToBuffer ( c, "     / /\\/ '_ \\/ __| __| '__| | | |/ __| __| |/ _ \\| '_ \\ ", 0x0A); c.Y++;
-	writeToBuffer ( c, "  /\\/ /_ | | | \\__ \\ |_| |  | |_| | (__| |_| | (_) | | | |" , 0x0A); c.Y++;
-	writeToBuffer ( c, "  \\____/ |_| |_|___/\\__|_|   \\__,_|\\___|\\__|_|\\___/|_| |_|", 0x0A); c.Y++;
+	writeToBuffer ( c, "     ___            __ _ _      ", 0x0A); c.Y++;
+	writeToBuffer ( c, "    / _ \\_ __ ___  / _(_) | ___ ", 0x0A); c.Y++;
+	writeToBuffer ( c, "   / /_)/ '__/ _ \\| |_| | |/ _ \\ ", 0x0A); c.Y++;
+	writeToBuffer ( c, "  / ___/| | | (_) |  _| | |  __/" , 0x0A); c.Y++;
+	writeToBuffer ( c, "  \\/    |_|  \\___/|_| |_|_|\\___|", 0x0A); c.Y++;
 	writeToBuffer ( c, "                                                         ", 0x0A); c.Y++;
 	writeToBuffer ( c, "================================================================================", 0x0A); c.Y+=4;	
 
@@ -124,6 +128,115 @@ void renderInstruction()
 	
 }
 
+void renderInfo()
+{
+	string eInfo;
+	ifstream Info;
+	Info.open("Info.txt");
+	string saved;
+	ifstream savefile;
+	savefile.open ("save.txt");
+
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+
+	while (!Info.eof())
+	{
+		getline(Info,eInfo);
+		writeToBuffer( c, eInfo,0x0A); c.Y++;
+	}
+
+	Info.close();
+
+	while (!savefile.eof())
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			getline(savefile, save[i]);
+
+	c.X = 4;
+	c.Y = 7;
+
+	writeToBuffer(c, "€±∞", 0x09 ); c.X+=9;
+	writeToBuffer(c, "Cold Meteor", 0x09 ); 
+
+	c.Y+=6; c.X = 4;
+
+	if (save[2] == "red")
+	{
+		writeToBuffer(c, "€±∞", 0x0C ); c.X+=9;
+		writeToBuffer(c, "Meteor", 0x0C ); 
+	}
+	else
+	{
+		writeToBuffer(c, "???", 0x0A ); c.X+=9;
+		writeToBuffer(c, "???? ?????", 0x0A ); 
+	}
+	c.Y+=6; c.X = 4;
+
+	if (save[4] == "yellow")
+	{
+		writeToBuffer(c, "€±∞", 0x0E ); c.X+=9;
+		writeToBuffer(c, "Unstable Meteor", 0x0E );
+	}
+	else
+	{
+		writeToBuffer(c, "???", 0x0A ); c.X+=9;
+		writeToBuffer(c, "???? ?????", 0x0A ); 
+	}
+
+	c.X = 37; c.Y = 7;
+	if (save[1] == "pink")
+	{
+		writeToBuffer (c , "//--\\\\", 0x0D); c.X-=2; c.Y++;
+		writeToBuffer (c , "_-======-_ ", 0x0D); c.X-=2; c.Y++;
+		writeToBuffer (c , "(=__\\\\  //__=)", 0x0D); c.X+=5; c.Y++;
+		writeToBuffer (c , "----", 0x0D);
+
+		c.X = 54; c.Y = 7;
+		writeToBuffer (c , "Agent Pink a.k.a. Anne", 0x0D); c.Y+=2; c.X = 51;
+		writeToBuffer (c , "Betrayed the Attack on Space", 0x0D); 
+	}
+
+	else
+	{
+		c.X++; c.Y++;
+		writeToBuffer (c , "????", 0x0A); 
+
+		c.X = 62;
+		writeToBuffer (c , "????", 0x0A); 
+	}
+
+	c.X = 39; c.Y = 14;
+
+	if (save[3] == "white")
+	{
+		writeToBuffer (c, "\\--=-=€€", 0x0F); c.Y++; c.X+=2;
+		writeToBuffer (c, "/-∞-||", 0x0F); c.Y++; c.X-=7;
+		writeToBuffer (c, "/===========<", 0x0F); c.Y++;
+		writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x0F); c.Y++;
+		writeToBuffer (c, "\\===========<", 0x0F); c.Y++; c.X+=7;
+		writeToBuffer (c, "\\-∞-||", 0x0F); c.Y++; c.X-=2;
+		writeToBuffer (c, "/--=-=€€", 0x0F); c.Y++;
+		c.X = 57; c.Y = 17;
+		writeToBuffer (c, "The Mothership", 0x0F); c.Y++; c.X+=2;
+	}
+	else
+	{
+		c.X--; c.Y+=3;
+		writeToBuffer (c , "????", 0x0A); 
+
+		c.X = 62;
+		writeToBuffer (c , "????", 0x0A); 
+	}
+
+			}
+	}
+
+	savefile.close();
+}
+
 void renderHighscore()
 { 
 	ifstream Read;
@@ -166,7 +279,7 @@ void renderHighscore()
 			writeToBuffer ( c , seethis , 0x0A ) ;
 
 			getline(Read,words);
-			c.X = 18;
+			c.X = 19;
 			seethis = words  ; 
 			writeToBuffer ( c , seethis , 0x0A ) ;
 		}
@@ -390,12 +503,14 @@ void renderBack()
 	c.X = 0;
 	c.Y = 23;
 
-	for (int i = 0; i < Pink.health/5; i++)
+	if (currentWave == 5)
 	{
-		writeToBuffer(c, "|", 0x04);
-		c.X++;
+		for (int i = 0; i < Pink.health/5; i++)
+		{
+			writeToBuffer(c, "|", 0x04);
+			c.X++;
+		}
 	}
-
 	if (waveDelay % 2 == 0)
 	{
 		renderWaveAlt(); 
@@ -558,7 +673,15 @@ void renderMothership()
 		{
 			if (Mothership[m].createProj[i] == true)
 			{
-				writeToBuffer (Mothership[m].bossProjectile[i] , "€±∞", 0x09);
+				if (currentWave == 10)
+				{
+					writeToBuffer (Mothership[m].bossProjectile[i] , "€±∞", 0x09);
+				}
+
+				if (currentWave == 15)
+				{
+					writeToBuffer (Mothership[m].bossProjectile[i] , "€±∞", 0x0C);
+				}
 			}
 		
 		}
@@ -580,7 +703,31 @@ void renderMothership()
 
 		else if (Mothership[m].createBoss == true)
 		{
-			if (Mothership[m].health > 400)
+			if (Mothership[m].health > 600)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x05); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x05); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x05); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x05); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x05); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x05); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x05); c.Y++;
+			}
+
+			else if (Mothership[m].health > 500)
+			{
+				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
+				writeToBuffer (c, "\\--=-=€€", 0x0D); c.Y++; c.X+=2;
+				writeToBuffer (c, "/-∞-||", 0x0D); c.Y++; c.X-=7;
+				writeToBuffer (c, "/===========<", 0x0D); c.Y++;
+				writeToBuffer (c, "|€€€€€±±±±∞∞∞", 0x0D); c.Y++;
+				writeToBuffer (c, "\\===========<", 0x0D); c.Y++; c.X+=7;
+				writeToBuffer (c, "\\-∞-||", 0x0D); c.Y++; c.X-=2;
+				writeToBuffer (c, "/--=-=€€", 0x0D); c.Y++;
+			}
+
+			else if (Mothership[m].health > 400)
 			{
 				c.X = Mothership[m].bossLocation.X; c.Y = Mothership[m].bossLocation.Y - 2; c.X+=5;
 				writeToBuffer (c, "\\--=-=€€", 0x0F); c.Y++; c.X+=2;
@@ -980,17 +1127,186 @@ void gameOver()
 	string words;
 	string b; 
 
-	COORD c;
-	c.X = 0;
-	c.Y = 0;
-	writeToBuffer(c, "   ______                             ___                        ", 0x0A); c.Y++;
-	writeToBuffer(c, " .' ___  |                          .'   `.                      ", 0x0A); c.Y++;
-	writeToBuffer(c, "/ .'   \_| ,--.  _ .--..--. .---.  /  .-.  \_   __ .---. _ .--.  ", 0x0A); c.Y++;
-	writeToBuffer(c, "| |   ____`'_\ :[ `.-. .-. / /__\\ | |   | [ \ [  / /__\[ `/'`\] ", 0x0A); c.Y++;
-	writeToBuffer(c, "\ `.___]  // | |,| | | | | | \__., \  `-'  /\ \/ /| \__.,| |    ", 0x0A); c.Y++;
-	writeToBuffer(c,"  `._____.'\'-;__[___||__||__'.__.'  `.___.'  \__/  '.__.[___]  ", 0x0A); c.Y++;
+	ifstream savefile;
+	ofstream writesave; 
+	savefile.open ("save.txt");
+
+	while (!savefile.eof())
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			getline(savefile, save[i]);
+		}
+	}
+
+	savefile.close();
+
+	writesave.open ("save.txt" ); 
+
+	if (currentWave > 1 || save[0] == "blue")
+	{
+		writesave << "blue" << endl;
+	}
+	else
+	{
+		writesave << "0" << endl;
+	}
+
+	if (currentWave > 4 || save[1] == "pink")
+	{
+		writesave << "pink" << endl;
+	}
+	else
+	{
+		writesave << "0" << endl;
+	}
+
+	if (currentWave > 5 || save[2] == "red")
+	{
+		writesave << "red" << endl;
+	}
+	else
+	{
+		writesave << "0" << endl;
+	}
+
+	if (currentWave > 9 || save[3] == "white")
+	{
+		writesave << "white" << endl;
+	}
+	else
+	{
+		writesave << "0" << endl;
+	}
+
+	if (currentWave > 10 || save[4] == "yellow")
+	{
+		writesave << "yellow" << endl;
+	}
+	else
+	{
+		writesave << "0" << endl;
+	}
+
+	writesave.close();
 	
-	c.X = 8; c.Y = 10;
+	string Keyboard[27] = {"[A]", "[B]", "[C]", "[D]", "[E]", "[F]", "[G]", "[H]", "[I]", "[J]", "[K]", "[L]", "[M]", "[N]", "[O]", "[P]", "[Q]", "[R]", "[S]", "[T]", "[U]", "[V]", "[W]", "[X]", "[Y]", "[Z]", "[SHIFT]"};
+	char Alpha[26] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+	string keyboard[27] = {"[a]", "[b]", "[c]", "[d]", "[e]", "[f]", "[g]", "[h]", "[i]", "[j]", "[k]", "[l]", "[m]", "[n]", "[o]", "[p]", "[q]", "[r]", "[s]", "[t]", "[u]", "[v]", "[w]", "[x]", "[y]", "[z]", "[SHIFT]"};
+	char alpha[26] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+	COORD c;
+	
+	c.X = 27; c.Y = 1;
+
+	writeToBuffer(c,"      - Game Over -", 0x0A);
+
+	c.X = 27; c.Y = 20;
+	
+	for (int i = 0; i < 27; i++)
+	{
+		if (i == 7 || i == 14 || i == 21)
+		{
+			c.X = 27;
+			c.Y++;
+		}
+
+		if (pointerLocation.X == c.X && pointerLocation.Y == c.Y  )
+		{
+			if (shift == 1)
+			{
+				writeToBuffer(c, keyboard[i], 0x0A); c.X+=4;
+			}
+
+			else if (shift == 0)
+			{
+				writeToBuffer(c, Keyboard[i], 0x0A); c.X+=4;
+			}
+
+			if ((keyPressed[K_ENTER] || keyPressed[K_SPACE]))
+			{
+				if (pointerLocation.X == 47 && pointerLocation.Y == 23  )
+				{
+					Beep (10000,200);
+
+					if (shift == 1)
+					{
+						shift = 0;
+					}
+
+					else
+					{
+						shift = 1;
+					}
+				}
+
+				else if (input.length() != 7)
+				{
+					Beep (10000,200);
+
+					if (shift == 1)
+					{
+						input += alpha[i];
+					}
+
+					else
+					{
+						input += Alpha[i];
+					}
+				}
+			}
+		}
+
+		else 
+		{
+			if (shift == 1)
+			{
+				writeToBuffer(c, keyboard[i], 0x02); c.X+=4;
+			}
+
+			else if (shift == 0)
+			{
+				writeToBuffer(c, Keyboard[i], 0x02); c.X+=4;
+			}
+		}
+	}
+
+	c.X = 27; c.Y = 18;
+	if (pointerLocation.X == c.X && pointerLocation.Y == c.Y  )
+	{
+		writeToBuffer(c, "[CLEAR]", 0x0A); c.X+=4;
+
+		if ((keyPressed[K_ENTER] || keyPressed[K_SPACE])&& input.length() > 0)
+		{
+			Beep (10000,200);
+			input.pop_back();
+		}
+	}
+	else
+	{
+		writeToBuffer(c, "[CLEAR]", 0x02); c.X+=4;
+	}
+
+	c.X = 47; c.Y = 18;
+	if (pointerLocation.X == c.X && pointerLocation.Y == c.Y  )
+	{
+		writeToBuffer(c, "[ENTER]", 0x0A); c.X+=4;
+		
+
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE] && input.length() > 0)
+		{
+			updateScore();
+			Beep (26000,200);
+			state = leaderboard;
+			pointerLocation.X = 6; 
+			pointerLocation.Y = 18; 
+		}	
+	}
+	else
+	{
+		writeToBuffer(c, "[ENTER]", 0x02); c.X+=4;
+	}
+
+	c.X = 32; c.Y = 10;
 	writeToBuffer ( c, "#1" , 0x0A);c.Y++;
 	writeToBuffer ( c, "#2" , 0x0A);c.Y++;
 	writeToBuffer ( c, "#3" , 0x0A);c.Y++;
@@ -1000,20 +1316,21 @@ void gameOver()
 	Read.open ("highscores.txt" ) ;  
 	Read2.open ("highscorename.txt" ) ; 
 
+	c.Y = 10;
+
 	if (Read.is_open() && Read2.is_open() )
 	{ 
 		for ( int z = 0 ; z < 5 ; z++ ) 
 		{
 			getline(Read2,b);
-			c.X = 11;
-			c.Y = 10 + z ;
+			c.X = 40;
 			seethis = b;
 			writeToBuffer ( c , seethis , 0x0A ) ;
 
 			getline(Read,words);
-			c.X = 18;
+			c.X = 36;
 			seethis = words  ; 
-			writeToBuffer ( c , seethis , 0x0A ) ;
+			writeToBuffer ( c , seethis , 0x0A ) ; 	c.Y++;
 		}
 	}
 
@@ -1021,11 +1338,12 @@ void gameOver()
 	Read2.close();
 	
 	char intscore[10];
-	c.Y+=2;
-	c.X=8;
+	c.Y++;
+	c.X=27;
 	writeToBuffer(c, "Your Final score is :",0x0A);
-	c.X=30;
+	c.X=49;
 	writeToBuffer(c, itoa(score, intscore, 10), 0x0A);c.Y+=2;
-	c.X=8;
-	writeToBuffer(c, "Please enter your name : ", 0x0A); 		
+	c.X=37;
+	writeToBuffer(c, "_______",0x0A);
+	writeToBuffer(c, input, 0x0A); 		
 }

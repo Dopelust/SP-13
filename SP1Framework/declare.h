@@ -1,8 +1,12 @@
+#include "sound.h"
+
 //Declarations
 
 bool keyPressed[K_COUNT];
 
 gameState state = menu;
+
+Sound snd;
 
 //Requisite
 COORD ConsoleSize = {80,25};
@@ -23,8 +27,8 @@ int ultiBar;
 COORD charLocation;
 //Enemy
 int currentWave;
-bool spawnenemy[20]; 
-COORD enemyLocation[20];
+bool spawnenemy[16]; 
+COORD enemyLocation[16];
 //Tutorial
 bool prompt[6];
 bool promptCondition[5];
@@ -39,7 +43,7 @@ int waveDelay = 0; //blinks the Wave
 int deathFrame[3]; //boss death animation
 int spawnFrame = 0; //boss spawn animation
 COORD explosionLocation;
-COORD deathLocation;
+COORD deathLocation[16];
 COORD nullLocation;
 COORD pointerLocation;
 bool collide = 0;
