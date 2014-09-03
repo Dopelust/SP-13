@@ -396,7 +396,7 @@ void update(double dt)
 			{
 				state = rule;
 				pointerLocation.X = 6; 
-				pointerLocation.Y = 18; 
+				pointerLocation.Y = 16; 
 			}	
 			else if (pointerLocation.Y == 14) //Leaderboard
 			{
