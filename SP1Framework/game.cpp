@@ -27,7 +27,7 @@ void init()
 	heart = 5; 
 	score = 0; 
 	ultiBar = 50; 
-	currentWave = 15; 
+	currentWave = 0; 
 	enemyLocation[0].X = ConsoleSize.X - 3;
 	createMissile[0] = 0 ; 
 	createMissile[1] = 0 ;
@@ -410,7 +410,7 @@ void update(double dt)
 			}
 			else if (pointerLocation.Y == 18) //Exit
 			{
-				g_quitGame = true;
+				g_quitGame = true ; 
 			}
 		}
 	}
@@ -537,11 +537,41 @@ void update(double dt)
 			}	
 			else if(pointerLocation.Y == (ConsoleSize.Y/2)+2)
 			{
-				g_quitGame = true;
+				pointerLocation.X = 30;
+				pointerLocation.Y = ConsoleSize.Y / 2 ;
+				state = Exit;
 			}
 		}
 	}
+	 
+	else if (state == Exit )
+	{
+		if (keyPressed[K_UP] && pointerLocation.Y != (ConsoleSize.Y / 2))
+		{
+			pointerLocation.Y-=2; 
+			Beep (1500,200);
+		}
 
+		if (keyPressed[K_DOWN] && pointerLocation.Y == (ConsoleSize.Y / 2) )
+		{
+			pointerLocation.Y+=2; 
+			Beep (1500,200);
+		}
+
+		if (keyPressed[K_ENTER] || keyPressed[K_SPACE])
+		{
+			Beep (10000,200);
+
+			if (pointerLocation.Y == (ConsoleSize.Y/2)) //quit game
+			{
+				g_quitGame = true ;
+			}	
+			else if(pointerLocation.Y == (ConsoleSize.Y/2)+2) // resume game , bug if u exit in menu cuz state = play 
+			{
+				state = play ;
+			}
+		}
+	}
 	
 
 }

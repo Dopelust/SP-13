@@ -64,7 +64,8 @@ void renderMenu()
 	{
 		writeToBuffer ( c, "       Exit", 0x02); c.Y+=4;
 	}
-	writeToBuffer ( c, "================================================================================", 0x0A); 
+	writeToBuffer ( c, "================================================================================", 0x0A); c.Y++;
+	writeToBuffer ( c, "Press Enter or Spacebar to select ! " , 0x0A) ; 
 	writeToBuffer ( pointerLocation , ">", 0x0A);
 }
 
@@ -425,6 +426,44 @@ void renderUI()
 
 		writeToBuffer ( pointerLocation, ">", 0x0A);
 	}
+
+	if (state == Exit)
+	{
+		c.X = ConsoleSize.X - 60;
+		c.Y = ( ConsoleSize.Y / 2 ) - 6;
+		writeToBuffer ( c, "===========================================", 0x0A); c.Y++;
+		writeToBuffer ( c, "|            Exiting Game                 |", 0x0A); c.Y++;
+		writeToBuffer ( c, "===========================================", 0x0A); c.Y++;
+		writeToBuffer ( c, "|                                         |", 0x0A); c.Y++;
+		writeToBuffer ( c, "|   Are you sure you want to exit game?   |", 0x0A); c.Y++;
+		writeToBuffer ( c, "|                                         |", 0x0A); c.Y++;
+		if (pointerLocation.Y == c.Y)
+		{
+			writeToBuffer ( c, "|                Yes                      |", 0x0A); c.Y++;
+		}
+		else
+		{
+			writeToBuffer ( c, "|", 0x0A); c.X++;
+			writeToBuffer ( c,"               Yes                       ", 0x02); c.X+=41;
+			writeToBuffer ( c,"|", 0x0A); c.X = ConsoleSize.X - 60;  c.Y++; 
+		}
+		writeToBuffer ( c, "|                                         |", 0x0A); c.Y++;
+		if (pointerLocation.Y == c.Y)
+		{
+			writeToBuffer ( c, "|                No                       |", 0x0A); c.Y++;
+		}
+		else
+		{
+			writeToBuffer ( c, "|", 0x0A); c.X++;
+			writeToBuffer ( c, "               No                        ", 0x02); c.X+=41;
+			writeToBuffer ( c,"|", 0x0A); c.X = ConsoleSize.X - 60;  c.Y++; 
+		}
+		writeToBuffer ( c, "|                                         |", 0x0A); c.Y++;
+		writeToBuffer ( c, "===========================================", 0x0A); c.Y++;
+
+		writeToBuffer ( pointerLocation, ">", 0x0A);
+	}
+
 }
 
 void renderPlayer()

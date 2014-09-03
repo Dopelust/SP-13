@@ -47,6 +47,7 @@ enum gameState
 	leaderboard,
 	credits,
 	pause,
+	Exit,
 	over
 };
 
